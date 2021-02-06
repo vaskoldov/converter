@@ -23,7 +23,7 @@ public class RequestUpdater extends Thread {
         setName("RequestUpdaterThread");
         isRunnable = Boolean.parseBoolean(props.getProperty("REQUEST_UPDATER"));
         h2Db = new H2(props);
-        LOG.info("Создано подключение к H2.");
+        LOG.info("Создано подключение к БД адаптера.");
         pgDb = new PG(props);
         LOG.info("Создано подключение к PostgreSQL.");
         sleepTime = Long.parseLong(props.getProperty("REQUEST_FREQ"));

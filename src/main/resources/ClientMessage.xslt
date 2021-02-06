@@ -2,7 +2,7 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 	<xsl:output method="xml" encoding="UTF-8"/>
 	<xsl:param name="ClientID"/>
-	<xsl:param name="PersonalSign"/>
+	<xsl:param name="PersonalSign"/>	
 	<xsl:param name="AttachmentFile"/>
 	<xsl:param name="AttachmentSign"/>
 	<xsl:template match="/">
@@ -13,7 +13,6 @@
 					<tns:clientId>
 						<xsl:value-of select="$ClientID"/>
 					</tns:clientId>
-					<tns:testMessage>true</tns:testMessage>
 				</tns:RequestMetadata>
 				<tns:RequestContent>
 					<tns:content>
@@ -33,7 +32,7 @@
 									</tns:filePath>
 									<xsl:if test="string-length($AttachmentSign) != 0">
 										<tns:SignaturePKCS7>
-											<xsl:copy-of select="$AttachmentSign"/>
+											<xsl:value-of select="$AttachmentSign"/>
 										</tns:SignaturePKCS7>
 									</xsl:if>
 									<tns:TransferMethod>MTOM</tns:TransferMethod>

@@ -56,7 +56,7 @@ public class ResponseProcessor extends Thread {
         }
         inputDir = Paths.get(props.getProperty("ADAPTER_PATH"), "integration", "files", props.getProperty("MNEMONIC"), "in");
         //attachmentDir = Paths.get(props.getProperty("ADAPTER_PATH"), "data", "base-storage", props.getProperty("MNEMONIC")); - с версии 3.1.8 это уже не так
-        attachmentDir = Paths.get(props.getProperty("ADAPTER_PATH"), "data", "base-storage", "in");
+        attachmentDir = Paths.get(props.getProperty("ADAPTER_PATH"), "data", props.getProperty("VERSION"), "base-storage", "in");
         outputDir = Paths.get(props.getProperty("EXCHANGE_PATH"), "responses");
         requestsDir = Paths.get(props.getProperty("EXCHANGE_PATH"), "requests");
         processedRequestsDir = requestsDir.resolve("processed");
