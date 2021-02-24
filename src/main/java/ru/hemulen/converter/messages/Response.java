@@ -12,7 +12,6 @@ import ru.hemulen.converter.thread.ResponseProcessor;
 
 import javax.xml.transform.TransformerException;
 import java.io.*;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -20,7 +19,6 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -147,16 +145,15 @@ public class Response {
                 // Формируем архив из XML ответа и файлов вложений, который сохраняется с именем исходного запроса и расширением ZIP
                 for (int i = 0; i < attachmentHeaders.getLength(); i++) {
                     Element attachmentHeader = (Element) attachmentHeaders.item(i);
-                    // Имя каталога с файлом - это ClientID ответа - до версии 3.1.8
-                    // В версии 3.1.8 имя каталога с файлом - это MessageID ответа
-                    Path attachmentPath = Paths.get(messageID);
-                    // Получаем имя подкаталога вложений из элемента Id - тоже новшество 3.1.8, но работает
-                    // не для всех ВС, почему-то. Вложения ЕИСУКС создаются в подкаталогах, ЕГРН - нет.
-                    Path attachmentSubfolder = null;
-                    NodeList attachmentSubfolderNodes = attachmentHeader.getElementsByTagName("Id");
-                    if (attachmentSubfolderNodes.getLength() != 0) {
-                        attachmentSubfolder = Paths.get(attachmentSubfolderNodes.item(0).getTextContent());
+                    // Имя каталога с файлом - это элемент Id из AttachmentHeader
+                    Path attachmentPath = null;
+                    NodeList attachmentPathNodes = attachmentHeader.getElementsByTagName("Id");
+                    if (attachmentPathNodes.getLength() != 0) {
+                        attachmentPath = Paths.get(attachmentPathNodes.item(0).getTextContent());
                     }
+                    // Получаем имя подкаталога вложений из элемента clientID - тоже новшество 4.0, но работает
+                    // не для всех ВС, почему-то. Вложения ЕИСУКС создаются в подкаталогах, ЕГРН - нет.
+                    Path attachmentSubfolder = Paths.get(clientID);
                     // Получаем имя файла
                     Path attachmentFile = null;
                     NodeList attachmentFileNodes = attachmentHeader.getElementsByTagName("filePath");

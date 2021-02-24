@@ -13,6 +13,7 @@
 					<tns:clientId>
 						<xsl:value-of select="$ClientID"/>
 					</tns:clientId>
+					<tns:testMessage>true</tns:testMessage>
 				</tns:RequestMetadata>
 				<tns:RequestContent>
 					<tns:content>

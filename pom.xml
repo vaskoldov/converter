@@ -15,7 +15,7 @@
     </properties>
 
     <groupId>ru.hemulen</groupId>
-    <artifactId>h2psql</artifactId>
+    <artifactId>converter</artifactId>
     <version>4.0</version>
     <packaging>jar</packaging>
     <name>converter</name>
