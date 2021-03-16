@@ -216,6 +216,11 @@ public class XMLTransformer {
                 if (regionCode.length() == 1) {
                     regionCode = "0" + regionCode;
                 }
+                switch (regionCode) {
+                    case "90": regionCode = "91"; // Кадастровую область "Крым" приводим к коду региона
+                               break;
+                    case "91": regionCode = "92"; // Кадастровую область "Севастополь" приводим к коду региона
+                }
             }
         } else {
             // А иначе ищем первый код длиной 2
