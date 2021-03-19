@@ -84,7 +84,7 @@ public class XMLTransformer {
      *
      * @param file XML-файл
      * @return DOM-объект
-     * @throws IOException ошибка файловой операции
+     * @throws IOException  ошибка файловой операции
      * @throws SAXException ошибка парсинга XML
      */
     public synchronized static Document fileToDocument(File file) throws IOException, SAXException {
@@ -124,11 +124,11 @@ public class XMLTransformer {
      * @param attachmentSign Подпись файла вложения
      */
     public synchronized static void createClientMessage(Document requestDOM,
-                                           File resultFile,
-                                           String clientID,
-                                           String personalSign,
-                                           String attachmentFile,
-                                           String attachmentSign) throws TransformerException {
+                                                        File resultFile,
+                                                        String clientID,
+                                                        String personalSign,
+                                                        String attachmentFile,
+                                                        String attachmentSign) throws TransformerException {
         transformerToClientMessage.setParameter("ClientID", clientID);
         transformerToClientMessage.setParameter("PersonalSign", personalSign);
         transformerToClientMessage.setParameter("AttachmentFile", attachmentFile);
@@ -217,9 +217,28 @@ public class XMLTransformer {
                     regionCode = "0" + regionCode;
                 }
                 switch (regionCode) {
-                    case "90": regionCode = "91"; // Кадастровую область "Крым" приводим к коду региона
-                               break;
-                    case "91": regionCode = "92"; // Кадастровую область "Севастополь" приводим к коду региона
+                    case "90":
+                        regionCode = "91"; // Кадастровую область "Крым" приводим к коду региона
+                        break;
+                    case "91":
+                        regionCode = "92"; // Кадастровую область "Севастополь" приводим к коду региона
+                        break;
+                    case "80":
+                        regionCode = "75";
+                        break;
+                    case "81":
+                        regionCode = "59";
+                        break;
+                    case "82":
+                        regionCode = "41";
+                        break;
+                    case "84":
+                    case "88":
+                        regionCode = "24";
+                        break;
+                    case "85":
+                        regionCode = "38";
+                        break;
                 }
             }
         } else {
