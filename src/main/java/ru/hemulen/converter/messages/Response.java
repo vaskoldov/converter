@@ -6,6 +6,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+import ru.hemulen.converter.exceptions.AttachmentException;
 import ru.hemulen.converter.exceptions.ParsingException;
 import ru.hemulen.converter.exceptions.ResponseException;
 import ru.hemulen.converter.thread.ResponseProcessor;
@@ -132,7 +133,7 @@ public class Response {
      *
      * @throws ResponseException ошибка при обработке ответа
      */
-    public void processPrimaryMessage() throws ResponseException, ParsingException {
+    public void processPrimaryMessage() throws ResponseException, AttachmentException, ParsingException {
         try {
             // Извлекаем секцию под MessagePrimaryContent в отдельный файл
             XMLTransformer.extractPrimaryContent(responseDOM, resultFile);
@@ -215,8 +216,16 @@ public class Response {
                     }
                     // Закрываем архив
                     zip.close();
-                    // Удаляем XML-файл с ответом
-                    Files.delete(resultFile.toPath());
+                    // Проверяем размер получившегося архива
+                    File archiveFile = new File(archiveFileName);
+                    if (archiveFile.exists() && archiveFile.length() == 0) {
+                        // Если архив нулевого размера, значит не все вложения были сформированы адаптером на момент обработки ответа
+                        // Выбрасываем исключение
+                        throw new AttachmentException("Нулевой размер архива с вложениями", new Exception());
+                    } else {
+                        // Удаляем XML-файл с ответом
+                        Files.delete(resultFile.toPath());
+                    }
                 } catch (IOException e) {
                     LOG.info(String.format("Произошла ошибка при формировании архива %s с вложениями.", archiveFileName));
                     throw new ResponseException(String.format("Не удалось сформировать архив с вложениями из ответа %s", responseFile.getName()), e);

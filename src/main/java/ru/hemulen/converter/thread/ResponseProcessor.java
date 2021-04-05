@@ -3,6 +3,7 @@ package ru.hemulen.converter.thread;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.hemulen.converter.db.PG;
+import ru.hemulen.converter.exceptions.AttachmentException;
 import ru.hemulen.converter.exceptions.ParsingException;
 import ru.hemulen.converter.exceptions.ResponseException;
 import ru.hemulen.converter.messages.Response;
@@ -178,6 +179,11 @@ public class ResponseProcessor extends Thread {
                     } catch (ParsingException e) {
                         // Это исключение возникает в случае, если пытались парсить не до конца скопированный файл
                         LOG.info(String.format("Не удалось распарсить ответ %s. Ответ будет обработан в следующем цикле.", file.getName()));
+                        // Больше ничего не делаем и оставляем файл ответа в каталоге IN до следующего цикла.
+                    } catch (AttachmentException e) {
+                        // Это исключение возникает, когда адаптер не успел обработать (сохранить) вложения, на которые
+                        // ссылается обрабатываемый ответ.
+                        LOG.info(String.format("Нулевой размер файла с архивом, полученном при обработке ответа %s. Ответ будет обработан в следующем цикле.", file.getName()));
                         // Больше ничего не делаем и оставляем файл ответа в каталоге IN до следующего цикла.
                     }
                 }
