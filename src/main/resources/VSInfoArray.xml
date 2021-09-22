@@ -275,4 +275,12 @@
 		<keywords>/*[local-name()="DriverLicensesRequest"]/*[local-name()="firstName"]/text()</keywords>
 		<keywords>/*[local-name()="DriverLicensesRequest"]/*[local-name()="middleName"]/text()</keywords>
 	</vsInfoEntry>
+	<vsInfoEntry>
+		<namespace>urn://x-artefacts-smev-gov-ru/services/service-adapter/types</namespace>
+		<name>Персональные данные пользователя ЕСИА</name>
+		<timeout>30</timeout>
+		<dailyLimit>20000</dailyLimit>
+		<priority>290</priority>
+	</vsInfoEntry>
+
 </vsInfoArray>

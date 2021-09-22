@@ -52,6 +52,7 @@ public class RequestProcessor extends Thread {
     public static Path failedDir;           // Каталог, куда складываются запросы ИС УВ, при обработке которых возникло исключение
     public static Path overlimitDir;        // Каталог, куда складываются запросы ИС УВ, чей суточный лимит на отправку исчерпан
     public static Path outputDir;           // Каталог, куда складываются запросы СМЭВ-адаптера (используется в Request, поэтому public
+    public static Path outputDir13;         // Каталог, куда складываются запросы для instance СМЭВ-адаптера, работающего с версией схем 1.3 СМЭВ
     public static Path attachmentDir;       // Каталог, куда складываются файлы вложений к запросам СМЭВ-адаптера
     public static Path signDir;             // Каталог, в который временно помещается файл с подписью XMLDSig или файлы вложений для подписи PKCS7
     public static VSInfoArray vsInfoArray;  // Класс с описанием всех обрабатываемых видов сведений
@@ -108,6 +109,9 @@ public class RequestProcessor extends Thread {
             }
             System.exit(1);
         }
+        // Запросы персональных данных пользователей ЕСИА помещаются сразу в выходной каталог второго instance адаптера, минуя очереди по приоритетам
+        outputDir13 = Paths.get(props.getProperty("ADAPTER_1_3_PATH"), "integration", "files", props.getProperty("MNEMONIC"), "out");
+
         attachmentDir = Paths.get(props.getProperty("ADAPTER_PATH"), "local-storage");
         if (!Files.exists(attachmentDir)) {
             try {
@@ -288,6 +292,10 @@ public class RequestProcessor extends Thread {
                                 } else {
                                     throw new SignException(String.format("Подпись ЕГРН не инициализирована. Файл %s не обработан.", file.getName()), new Exception());
                                 }
+                            case "Персональные данные пользователя ЕСИА":
+                                request.generateESIARequest();
+                                request.log();
+                                break;
                             default:
                                 // Преобразуем запрос в ClientMessage
                                 request.process();

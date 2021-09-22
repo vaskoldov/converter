@@ -31,6 +31,7 @@ public class XMLTransformer {
     private static final String FromQueryResultStyleSheet = "./src/main/resources/FromQueryResult.xslt";
     private static final String ToEGRNTechDescStylesheet = "./src/main/resources/EGRNStatement2TechDesc.xslt";
     private static final String ToEGRNMainRequestStylesheet = "./src/main/resources/EGRNStatement2Request.xslt";
+    private static final String ToESIAClientMessage = "./src/main/resources/ESIA.xslt";
     private static Logger LOG = LoggerFactory.getLogger(XMLTransformer.class.getName());
     private static DocumentBuilderFactory factory;
     private static DocumentBuilder builder;
@@ -39,6 +40,7 @@ public class XMLTransformer {
     private static Transformer transformerFromQueryResult;
     private static Transformer transformerEGRNToTechDesc;
     private static Transformer transformerEGRNToMainRequest;
+    private static Transformer transformerESIAToClientMessage;
     private static XPathFactory xpathFactory;
     private static XPath xpath;
 
@@ -69,6 +71,11 @@ public class XMLTransformer {
             File toEGRNMainRequestStyleSheet = new File(ToEGRNMainRequestStylesheet);
             StreamSource toEGRNMainRequestStyleSource = new StreamSource(toEGRNMainRequestStyleSheet);
             transformerEGRNToMainRequest = transformerFactory.newTransformer(toEGRNMainRequestStyleSource);
+
+            // Создаем трансформер для преобразования запроса персональных данных пользователя ЕСИА в ClientMessage
+            File toESIAClientMessageStylesheet = new File(ToESIAClientMessage);
+            StreamSource toESIAClientMessageStyleSource = new StreamSource(toESIAClientMessageStylesheet);
+            transformerESIAToClientMessage = transformerFactory.newTransformer(toESIAClientMessageStyleSource);
 
             // Создаем обработчик XPath запросов
             xpathFactory = XPathFactory.newInstance();
@@ -136,6 +143,13 @@ public class XMLTransformer {
         Source source = new DOMSource(requestDOM);
         Result target = new StreamResult(resultFile);
         transformerToClientMessage.transform(source, target);
+    }
+
+    public synchronized static void createESIAClientMessage(Document requestDOM, File resultFile, String clientID) throws TransformerException {
+        transformerESIAToClientMessage.setParameter("ClientID", clientID);
+        Source source = new DOMSource(requestDOM);
+        Result target = new StreamResult(resultFile);
+        transformerESIAToClientMessage.transform(source, target);
     }
 
     /**

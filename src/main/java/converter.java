@@ -27,9 +27,13 @@ public class converter {
         RequestSender requestSender = new RequestSender(props);
         // ResponseProcessor обрабатывает ответы из папки IN адаптера и помещает результаты в папку responses
         ResponseProcessor responseProcessor = new ResponseProcessor(props);
+        // Response13Processor обрабатывает ответы из папки IN второго instance адаптера, который работает с версией 1.3 схем СМЭВ
+        Response13Processor response13Processor = new Response13Processor(props);
+
         requestProcessor.start();
         requestSender.start();
         responseProcessor.start();
+        response13Processor.start();
         requestUpdater.start();
         responseUpdater.start();
     }
