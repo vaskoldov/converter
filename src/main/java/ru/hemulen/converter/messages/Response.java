@@ -161,13 +161,13 @@ public class Response {
                     if (attachmentFileNodes.getLength() != 0) {
                         attachmentFile = Paths.get(attachmentFileNodes.item(0).getTextContent());
                     }
-                    // Проверяем первый вариант пути в base-storage: каталог каталог id из <AttachmentHeader>
+                    // Проверяем первый вариант пути в base-storage: каталог id из <AttachmentHeader>
                     Path attachmentFilePath = ResponseProcessor.attachmentDir.resolve(attachmentPath).resolve(attachmentFile);
                     if (!attachmentFilePath.toFile().exists()) {
                         // Если файл не существует, то проверяем второй вариант пути в base-storage: каталог id из <AttachmentHeader> + clientID ответа
                         attachmentFilePath = ResponseProcessor.attachmentDir.resolve(attachmentPath).resolve(attachmentSubfolder).resolve(attachmentFile);
                         if (!attachmentFilePath.toFile().exists()) {
-                            // Если файл не сушествует, то проверяем третий вариант пути в base-storage: каталог clientID ответа
+                            // Если файл не существует, то проверяем третий вариант пути в base-storage: каталог clientID ответа
                             attachmentFilePath = ResponseProcessor.attachmentDir.resolve(attachmentSubfolder).resolve(attachmentFile);
                         }
                     }
