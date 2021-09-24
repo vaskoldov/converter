@@ -28,11 +28,10 @@ import java.util.Properties;
 public class Response13Processor extends Thread {
     private static Logger LOG = LoggerFactory.getLogger(Response13Processor.class.getName());
     public static PG dbConnection;  // Отдельное подключение к БД PostgreSQL для обработчика ответов
-    private Boolean isRunnable;
+    private Boolean isRunnable;     // Признак, что процесс продолжает работать
     private long sleepTime;         // Время задержки перед следующим опросом каталога, если он оказывается пуст
-    private Path inputDir;          // Каталог, в который адаптер помещает ответы СМЭВ (IN)
+    public static Path inputDir;    // Каталог, в который адаптер помещает ответы СМЭВ (IN)
     public static Path attachmentDir;      // Каталог, в который адаптер помещает файлы вложений
-    public static Path attachmentDir13;    // Каталог, в который второй instance адаптера помещает файлы вложений
     public static Path outputDir;   // Каталог, из которого ответы забирает ИС УВ (responses)
     private Path processedDir;      // Каталог, в который складываются обработанные ответы
     private Path failedDir;         // Каталог, в который складываются ответы, при обработке которых возникло исключение
@@ -93,13 +92,12 @@ public class Response13Processor extends Thread {
                 e.printStackTrace();
             }
         }
-        LOG.info("Настроены рабочие каталоги.");
-        LOG.info("ResponseProcessor инициализирован.");
+        LOG.info("Настроены рабочие каталоги второго instance адаптера.");
+        LOG.info("ResponseProcessor13 инициализирован.");
     }
 
     @Override
     public void run() {
-        //LOG.info(String.format("Параметр запуска потока isRunnable: %s.", Boolean.toString(isRunnable)));
         while (isRunnable) {
             // Читаем файлы в каталоге ответов
             File[] files = inputDir.toFile().listFiles();

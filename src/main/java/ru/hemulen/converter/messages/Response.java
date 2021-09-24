@@ -9,7 +9,9 @@ import org.xml.sax.SAXException;
 import ru.hemulen.converter.exceptions.AttachmentException;
 import ru.hemulen.converter.exceptions.ParsingException;
 import ru.hemulen.converter.exceptions.ResponseException;
+import ru.hemulen.converter.thread.RequestProcessor;
 import ru.hemulen.converter.thread.ResponseProcessor;
+import ru.hemulen.converter.thread.Response13Processor;
 
 import javax.xml.transform.TransformerException;
 import java.io.*;
@@ -40,8 +42,11 @@ public class Response {
     private String errSource;       // Тип источника ошибки
     private String errCode;         // Код ошибки
     private String errDescription;  // Описание ошибки
+    private Boolean isESIAResponse; // Признак, что ответ пришел во второй instance адаптера
 
     public Response(File responseFile) throws ResponseException, ParsingException {
+        // Определяем, в каком каталоге находится обрабатываемый запрос
+        this.isESIAResponse = responseFile.getPath().startsWith(Response13Processor.inputDir.toString());
         this.responseFile = responseFile;
         this.errCode = "";
         this.errDescription = "";
@@ -141,6 +146,9 @@ public class Response {
             Element root = responseDOM.getDocumentElement();
             NodeList attachmentHeaders = root.getElementsByTagName("AttachmentHeader");
             if (attachmentHeaders.getLength() != 0) {
+                // Определяем путь к каталогу с вложениями, который зависит от instance адаптера, получившего ответ
+                Path attachmentDir = (this.isESIAResponse)?Response13Processor.attachmentDir:ResponseProcessor.attachmentDir;
+
                 // Определяем массив файлов вложений
                 List<File> attachmentFiles = new LinkedList<>();
                 // Формируем архив из XML ответа и файлов вложений, который сохраняется с именем исходного запроса и расширением ZIP
@@ -161,14 +169,15 @@ public class Response {
                     if (attachmentFileNodes.getLength() != 0) {
                         attachmentFile = Paths.get(attachmentFileNodes.item(0).getTextContent());
                     }
+
                     // Проверяем первый вариант пути в base-storage: каталог id из <AttachmentHeader>
-                    Path attachmentFilePath = ResponseProcessor.attachmentDir.resolve(attachmentPath).resolve(attachmentFile);
+                    Path attachmentFilePath = attachmentDir.resolve(attachmentPath).resolve(attachmentFile);
                     if (!attachmentFilePath.toFile().exists()) {
                         // Если файл не существует, то проверяем второй вариант пути в base-storage: каталог id из <AttachmentHeader> + clientID ответа
-                        attachmentFilePath = ResponseProcessor.attachmentDir.resolve(attachmentPath).resolve(attachmentSubfolder).resolve(attachmentFile);
+                        attachmentFilePath = attachmentDir.resolve(attachmentPath).resolve(attachmentSubfolder).resolve(attachmentFile);
                         if (!attachmentFilePath.toFile().exists()) {
                             // Если файл не существует, то проверяем третий вариант пути в base-storage: каталог clientID ответа
-                            attachmentFilePath = ResponseProcessor.attachmentDir.resolve(attachmentSubfolder).resolve(attachmentFile);
+                            attachmentFilePath = attachmentDir.resolve(attachmentSubfolder).resolve(attachmentFile);
                         }
                     }
                     if (attachmentFilePath.toFile().exists()) {

@@ -12,7 +12,7 @@
 					</tns:clientId>
 					<tns:RoutingInformation>
 						<tns:DynamicRouting>
-							<tns:DynamicValue>MNSV10</tns:DynamicValue>
+							<tns:DynamicValue>ISIA01001</tns:DynamicValue>
 						</tns:DynamicRouting>
 						<tns:RegistryRouting>
 							<xsl:for-each select="//directive:RegistryRecord">
@@ -22,7 +22,7 @@
 									</tns:RecordId>
 									<tns:UseGeneralRouting>false</tns:UseGeneralRouting>
 									<tns:DynamicRouting>
-										<tns:DynamicValue>MNSV10</tns:DynamicValue>
+										<tns:DynamicValue>ISIA01001</tns:DynamicValue>
 									</tns:DynamicRouting>
 								</tns:RegistryRecordRouting>
 							</xsl:for-each>
