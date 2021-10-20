@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:fo="http://www.w3.org/1999/XSL/Format" xmlns:directive="urn://x-artefacts-smev-gov-ru/services/message-exchange/types/directive/1.3" xmlns:tns="urn://x-artefacts-smev-gov-ru/services/service-adapter/types">
-	<xsl:output method="xml" encoding="UTF-8"/>
+	<xsl:output method="xml" version="1.0" encoding="UTF-8" indent="no"/>
 	<xsl:param name="ClientID"/>
 	<xsl:template match="/">
 		<tns:ClientMessage xmlns:tns="urn://x-artefacts-smev-gov-ru/services/service-adapter/types">

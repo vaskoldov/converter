@@ -245,6 +245,63 @@
 		<dailyLimit>20000</dailyLimit>
 		<priority>290</priority>
 	</vsInfoEntry>
+	<vsInfoEntry>
+		<namespace>urn://x-artefacts-fns-zaksvegrul/root/312-83/4.0.0</namespace>
+		<name>ЕГРЮЛ (новый)</name>
+		<timeout>30</timeout>
+		<dailyLimit>70000</dailyLimit>
+		<priority>210</priority>
+		<keywords>/*[local-name()="ZAKRSVEGRULRequest"]/*[local-name()="ЗапросЮЛ"]/*[local-name()="ИННЮЛ"]/text()</keywords>
+		<keywords>/*[local-name()="ZAKRSVEGRULRequest"]/*[local-name()="ЗапросЮЛ"]/*[local-name()="ОГРН"]/text()</keywords>
+	</vsInfoEntry>
+	<vsInfoEntry>
+		<namespace>urn://x-artefacts-fns-zaksvegrip/root/312-90/4.0.0</namespace>
+		<name>ЕГРИП (новый)</name>
+		<timeout>30</timeout>
+		<dailyLimit>70000</dailyLimit>
+		<priority>200</priority>
+		<keywords>/*[local-name()="ZAKSVEGRIPRequest"]/*[local-name()="ЗапросИП"]/*[local-name()="ИННФЛ"]/text()</keywords>
+		<keywords>/*[local-name()="ZAKSVEGRIPRequest"]/*[local-name()="ЗапросИП"]/*[local-name()="ОГРНИП"]/text()</keywords>
+	</vsInfoEntry>
+	<vsInfoEntry>
+		<namespace>urn://mvd/guvm/passport-dossier/1.0.0</namespace>
+		<name>Паспорта гражданина РФ</name>
+		<timeout>30</timeout>
+		<dailyLimit>70000</dailyLimit>
+		<priority>250</priority>
+		<keywords>/*[local-name()="passportDossierRequest"]/*[local-name()="person"]/*[local-name()="lastName"]/text()</keywords>
+		<keywords>/*[local-name()="passportDossierRequest"]/*[local-name()="person"]/*[local-name()="firstName"]/text()</keywords>
+		<keywords>/*[local-name()="passportDossierRequest"]/*[local-name()="person"]/*[local-name()="middleName"]/text()</keywords>
+		<keywords>/*[local-name()="passportDossierRequest"]/*[local-name()="person"]/*[local-name()="birthDate"]/text()</keywords>
+		<keywords>/*[local-name()="passportDossierRequest"]/*[local-name()="passport"]/*[local-name()="series"]/text()</keywords>
+		<keywords>/*[local-name()="passportDossierRequest"]/*[local-name()="passport"]/*[local-name()="number"]/text()</keywords>
+	</vsInfoEntry>
+	<vsInfoEntry>
+		<namespace>urn://obrnadzor-gosuslugi-ru/frdo/1.0.2</namespace>
+		<name>Документы об образовании из ФРДО</name>
+		<timeout>30</timeout>
+		<dailyLimit>70000</dailyLimit>
+		<priority>260</priority>
+		<keywords>/*[local-name()="FRDORequest"]/*[local-name()="CheckDocumentRequest"]/*[local-name()="Person"]/*[local-name()="Surname"]/text()</keywords>
+		<keywords>/*[local-name()="FRDORequest"]/*[local-name()="CheckDocumentRequest"]/*[local-name()="Person"]/*[local-name()="Name"]/text()</keywords>
+		<keywords>/*[local-name()="FRDORequest"]/*[local-name()="CheckDocumentRequest"]/*[local-name()="Person"]/*[local-name()="Patronymic"]/text()</keywords>
+		<keywords>/*[local-name()="FRDORequest"]/*[local-name()="GetDocumentsRequest"]/*[local-name()="Person"]/*[local-name()="Surname"]/text()</keywords>
+		<keywords>/*[local-name()="FRDORequest"]/*[local-name()="GetDocumentsRequest"]/*[local-name()="Person"]/*[local-name()="Name"]/text()</keywords>
+		<keywords>/*[local-name()="FRDORequest"]/*[local-name()="GetDocumentsRequest"]/*[local-name()="Person"]/*[local-name()="Patronymic"]/text()</keywords>
+	</vsInfoEntry>
+	<vsInfoEntry>
+		<namespace>urn://x-artefacts-gp-1928-ru/1/1.0.0</namespace>
+		<name>ЮЛ, привлеченные к административной ответственности</name>
+		<timeout>30</timeout>
+		<dailyLimit>70000</dailyLimit>
+		<priority>270</priority>
+		<keywords>/*[local-name()="GP1928Request"]/*[local-name()="GPSearchRecordRequest"]/*[local-name()="DateFrom"]/text()</keywords>
+		<keywords>/*[local-name()="GP1928Request"]/*[local-name()="GPSearchRecordRequest"]/*[local-name()="DateTo"]/text()</keywords>
+		<keywords>/*[local-name()="GP1928Request"]/*[local-name()="GPGetRecordRequest"]/*[local-name()="ID"]/text()</keywords>
+		<keywords>/*[local-name()="GP1928Request"]/*[local-name()="GPSearchRecordByINNRequest"]/*[local-name()="INN"]/text()</keywords>
+		<keywords>/*[local-name()="GP1928Request"]/*[local-name()="GPSearchRecordsByOGRNRequest"]/*[local-name()="OGRN"]/text()</keywords>
+	</vsInfoEntry>
+	
 	<!-- 
 ================= Неиспользуемые виды сведений =================
 	<vsInfoEntry>
