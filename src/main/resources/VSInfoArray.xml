@@ -301,7 +301,45 @@
 		<keywords>/*[local-name()="GP1928Request"]/*[local-name()="GPSearchRecordByINNRequest"]/*[local-name()="INN"]/text()</keywords>
 		<keywords>/*[local-name()="GP1928Request"]/*[local-name()="GPSearchRecordsByOGRNRequest"]/*[local-name()="OGRN"]/text()</keywords>
 	</vsInfoEntry>
-	
+	<vsInfoEntry>
+		<namespace>http://kvs.pfr.com/labor-activity/1.0.1</namespace>
+		<name>Сведения о трудовой деятельности</name>
+		<timeout>30</timeout>
+		<dailyLimit>70000</dailyLimit>
+		<priority>280</priority>
+		<keywords>/*[local-name()="LaborActivityDataRequest"]/*[local-name()="FamilyName"]/text()</keywords>
+		<keywords>/*[local-name()="LaborActivityDataRequest"]/*[local-name()="FirstName"]/text()</keywords>
+		<keywords>/*[local-name()="LaborActivityDataRequest"]/*[local-name()="Patronymic"]/text()</keywords>
+		<keywords>/*[local-name()="LaborActivityDataRequest"]/*[local-name()="Snils"]/text()</keywords>
+	</vsInfoEntry>
+	<vsInfoEntry>
+		<namespace>urn://cmv.pfr.ru/getFioBySnils/1.1.0</namespace>
+		<name>Данные лицевого счета по СНИЛС</name>
+		<timeout>30</timeout>
+		<dailyLimit>70000</dailyLimit>
+		<priority>280</priority>
+		<keywords>/*[local-name()="Request"]/*[local-name()="SNILS"]/text()</keywords>
+	</vsInfoEntry>
+	<vsInfoEntry>
+		<namespace>http://www.fssprus.ru/namespace/incoming/2019/1</namespace>
+		<name>ФССП</name>
+		<timeout>30</timeout>
+		<dailyLimit>70000</dailyLimit>
+		<priority>290</priority>
+		<keywords>/*[local-name()="IRequest"]/*[local-name()="DocType"]/text()</keywords>
+		<keywords>/*[local-name()="IRequest"]/*[local-name()="DebtorName"]/text()</keywords>
+	</vsInfoEntry>
+	<vsInfoEntry>
+		<namespace>http://www.fssprus.ru/namespace/IRequestOther/2020/1</namespace>
+		<name>ФССП</name>
+		<timeout>30</timeout>
+		<dailyLimit>70000</dailyLimit>
+		<priority>290</priority>
+		<keywords>/*[local-name()="IRequestOther"]/*[local-name()="DocType"]/text()</keywords>
+		<keywords>/*[local-name()="IRequestOther"]/*[local-name()="DebtorName"]/text()</keywords>
+		<keywords>/*[local-name()="IRequestOther"]/*[local-name()="DebtorINN"]/text()</keywords>
+	</vsInfoEntry>
+
 	<!-- 
 ================= Неиспользуемые виды сведений =================
 	<vsInfoEntry>
