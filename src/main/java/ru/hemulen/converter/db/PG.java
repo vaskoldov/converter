@@ -74,16 +74,24 @@ public class PG implements AutoCloseable {
      */
     public Timestamp updateRequests(ResultSet resultSet) { // resultSet закрывается в вызывающем методе
         Timestamp latestTimestamp = null;
+        Timestamp currentTimestamp;
+        if (resultSet == null) return latestTimestamp;
         try {
             while (resultSet.next()) {
                 // 1 - clientID запроса
                 // 2 - messageID запроса
-                // 3 - время отправки запроса
+                // 3 - время отправки запроса SENDING_DATE
                 requestsPS.setString(1, resultSet.getString(2));
                 requestsPS.setTimestamp(2, resultSet.getTimestamp(3));
                 requestsPS.setString(3, resultSet.getString(1));
                 requestsPS.executeUpdate();
-                latestTimestamp = resultSet.getTimestamp(3);
+                currentTimestamp= resultSet.getTimestamp(3);
+                // Сохраняем самое позднее время отправки запроса из resultSet
+                if (latestTimestamp == null) {
+                    latestTimestamp = currentTimestamp;
+                } else if (currentTimestamp.after(latestTimestamp)) {
+                    latestTimestamp = currentTimestamp;
+                }
             }
 
         } catch (SQLException | NullPointerException e) {

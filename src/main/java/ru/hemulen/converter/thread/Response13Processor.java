@@ -25,15 +25,13 @@ import java.util.Properties;
  * Если обработка завершилась успешно, то файл перемещается в подкаталог processed.
  * Если обработка завершилась с ошибкой, то файл перемещается в подкаталог failed, а ошибка записывается в лог.
  */
-public class ResponseProcessor extends Thread {
-    private static Logger LOG = LoggerFactory.getLogger(ResponseProcessor.class.getName());
+public class Response13Processor extends Thread {
+    private static Logger LOG = LoggerFactory.getLogger(Response13Processor.class.getName());
     public static PG dbConnection;  // Отдельное подключение к БД PostgreSQL для обработчика ответов
-    private Boolean isRunnable;
+    private Boolean isRunnable;     // Признак, что процесс продолжает работать
     private long sleepTime;         // Время задержки перед следующим опросом каталога, если он оказывается пуст
-    private Path inputDir;          // Каталог, в который адаптер помещает ответы СМЭВ (IN)
-    private Path inputDir13;        // Каталог, в который второй instance адаптера помещает ответы СМЭВ (IN)
+    public static Path inputDir;    // Каталог, в который адаптер помещает ответы СМЭВ (IN)
     public static Path attachmentDir;      // Каталог, в который адаптер помещает файлы вложений
-    public static Path attachmentDir13;    // Каталог, в который второй instance адаптера помещает файлы вложений
     public static Path outputDir;   // Каталог, из которого ответы забирает ИС УВ (responses)
     private Path processedDir;      // Каталог, в который складываются обработанные ответы
     private Path failedDir;         // Каталог, в который складываются ответы, при обработке которых возникло исключение
@@ -41,26 +39,24 @@ public class ResponseProcessor extends Thread {
     public static Path processedRequestsDir;    // Каталог с отправленными запросами
     public static Path errorDir;    // Каталог, в который перемещаются запросы, на которые из СМЭВ пришла ошибка
 
-    public ResponseProcessor(Properties props) {
+    public Response13Processor(Properties props) {
         // Устанавливаем имя потока
-        setName("ResponseProcessorThread");
+        setName("Response13ProcessorThread");
         // Запуск процесса настраивается в конфигурации
-        isRunnable = Boolean.parseBoolean(props.getProperty("RESPONSE_PROCESSOR"));
+        isRunnable = Boolean.parseBoolean(props.getProperty("RESPONSE_1_3_PROCESSOR"));
         // Подключаемся к базе данных
         dbConnection = new PG(props);
         LOG.info("Создано подключение к PostgreSQL.");
         // Частота опроса каталога IN
         sleepTime = Long.parseLong(props.getProperty("RESPONSE_FREQ"));
         // Настраиваем каталоги
-        if (!Files.exists(Paths.get(props.getProperty("ADAPTER_PATH")))) {
+        if (!Files.exists(Paths.get(props.getProperty("ADAPTER_1_3_PATH")))) {
             // Если в параметре передан некорректный каталог, то прекращаем работу приложения
-            LOG.error("В настройках указан некорректный каталог СМЭВ-адаптера. Работа завершается.");
+            LOG.error("В настройках указан некорректный каталог второго instance СМЭВ-адаптера. Работа завершается.");
             System.exit(1);
         }
-        inputDir = Paths.get(props.getProperty("ADAPTER_PATH"), "integration", "files", props.getProperty("MNEMONIC"), "in");
-        inputDir13 = Paths.get(props.getProperty("ADAPTER_1_3_PATH"), "integration", "files", props.getProperty("MNEMONIC"), "in");
-        attachmentDir = Paths.get(props.getProperty("ADAPTER_PATH"), "data", props.getProperty("VERSION"), "base-storage", "in");
-        attachmentDir13 = Paths.get(props.getProperty("ADAPTER_1_3_PATH"),"data", props.getProperty("VERSION"), "base-storage", "in");
+        inputDir = Paths.get(props.getProperty("ADAPTER_1_3_PATH"), "integration", "files", props.getProperty("MNEMONIC"), "in");
+        attachmentDir = Paths.get(props.getProperty("ADAPTER_1_3_PATH"), "data", props.getProperty("VERSION"), "base-storage", "in");
         outputDir = Paths.get(props.getProperty("EXCHANGE_PATH"), "responses");
         requestsDir = Paths.get(props.getProperty("EXCHANGE_PATH"), "requests");
         processedRequestsDir = requestsDir.resolve("processed");
@@ -96,13 +92,12 @@ public class ResponseProcessor extends Thread {
                 e.printStackTrace();
             }
         }
-        LOG.info("Настроены рабочие каталоги.");
-        LOG.info("ResponseProcessor инициализирован.");
+        LOG.info("Настроены рабочие каталоги второго instance адаптера.");
+        LOG.info("ResponseProcessor13 инициализирован.");
     }
 
     @Override
     public void run() {
-        //LOG.info(String.format("Параметр запуска потока isRunnable: %s.", Boolean.toString(isRunnable)));
         while (isRunnable) {
             // Читаем файлы в каталоге ответов
             File[] files = inputDir.toFile().listFiles();
@@ -110,7 +105,7 @@ public class ResponseProcessor extends Thread {
             if (files.length <= 2) {
                 // Каталог пуст, не считая подкаталогов processed и failed - спим какое-то время и снова опрашиваем каталог
                 try {
-                    LOG.info("Ответы отсутствуют.");
+                    LOG.info("Ответы в адаптере 1.3 отсутствуют.");
                     sleep(sleepTime);
                 } catch (InterruptedException e) {
                     LOG.error(e.getMessage());
@@ -191,7 +186,7 @@ public class ResponseProcessor extends Thread {
                     }
                 }
             }
-            LOG.info(String.format("Обработано %d ответов из %d.", filesNum, files.length-2));
+            LOG.info(String.format("Обработано %d ответов из %d (адаптер 1.3).", filesNum, files.length-2));
         }
     }
 

@@ -2,6 +2,7 @@ package ru.hemulen.converter.thread;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.hemulen.converter.db.Adapter13DB;
 import ru.hemulen.converter.db.H2;
 import ru.hemulen.converter.db.PG;
 
@@ -14,6 +15,7 @@ public class RequestUpdater extends Thread {
     private static Logger LOG = LoggerFactory.getLogger(RequestUpdater.class.getName());
     private boolean isRunnable;
     private H2 h2Db;
+    private Adapter13DB adapter13DB;
     private PG pgDb;
     private long sleepTime;
     private Timestamp lastUpdateTime;
@@ -23,7 +25,9 @@ public class RequestUpdater extends Thread {
         setName("RequestUpdaterThread");
         isRunnable = Boolean.parseBoolean(props.getProperty("REQUEST_UPDATER"));
         h2Db = new H2(props);
-        LOG.info("Создано подключение к БД адаптера.");
+        LOG.info("Создано подключение к БД первого instance адаптера.");
+        adapter13DB = new Adapter13DB(props);
+        LOG.info("Создано подключение к БД второго instance адаптера.");
         pgDb = new PG(props);
         LOG.info("Создано подключение к PostgreSQL.");
         sleepTime = Long.parseLong(props.getProperty("REQUEST_FREQ"));
@@ -41,19 +45,30 @@ public class RequestUpdater extends Thread {
     public void run() {
         while (isRunnable) {
             try {
-                // Получаем из базы H2 все запросы, отправленные с момента последнего обновления
+                // Получаем из базы первого instance адаптера все запросы, отправленные с момента последнего обновления
                 ResultSet result = h2Db.getRequests(lastUpdateTime);
-                if (result != null) {
-                    // Обновляем в PHP-адаптере message_id, send_timestamp и status всех обработанных запросов
-                    // updateRequests возвращает самое позднее время SEND_DATE в result
-                    Timestamp lastCreateDate = pgDb.updateRequests(result);
-                    if (lastCreateDate != null) {
+                // Получаем из базы второго instance адаптера все запросы, отправленные с момента последнего обновления
+                ResultSet result13 = adapter13DB.getRequests(lastUpdateTime);
+                // Обновляем в PHP-адаптере message_id, send_timestamp и status всех обработанных запросов
+                // updateRequests возвращает самое позднее время SEND_TIMESTAMP в наборе данных из параметра
+                Timestamp lastCreateDate = pgDb.updateRequests(result);
+                Timestamp lastCreateDate13 = pgDb.updateRequests(result13);
+
+                if (lastCreateDate != null && lastCreateDate13 != null) {
+                    // Сохраняем самое раннее из SEND_TIMESTAMP из двух наборов данных
+                    if (lastCreateDate.before(lastCreateDate13)) {
                         lastUpdateTime = lastCreateDate;
+                    } else {
+                        lastUpdateTime = lastCreateDate13;
                     }
+                } else if (lastCreateDate != null) {
+                    lastUpdateTime = lastCreateDate;
+                } else if (lastCreateDate13 != null) {
+                    lastUpdateTime = lastCreateDate13;
                 }
-                if (result != null) {
-                    result.close();
-                }
+                if (result != null) result.close();
+                if (result13 != null) result13.close();
+
                 // Сохраняем на всякий случай время последнего обновления запросов в БД postgres
                 pgDb.setLastRequestTimestamp(lastUpdateTime);
                 // И засыпаем на определенное в параметре время

@@ -200,7 +200,7 @@ public class Request {
      * @throws RequestException ошибка при обоработке запроса
      */
     public void generateEGRNRequest() throws RequestException, ParserConfigurationException, SAXException, IOException, SignException {
-        // Копируем файл в каталог для подписания
+        // Копируем файл в каталог для подписания.
         // Перемещать нельзя, т.к. в каталоге requests должен остаться исходный файл на случай исключений,
         // после которых он перемещается в каталог failed
         Path targetPath = RequestProcessor.signDir.resolve(requestFile.toPath().getFileName());
@@ -275,6 +275,27 @@ public class Request {
         this.requestDOM = AbstractTools.fileToElement(this.requestFile).getOwnerDocument();
         this.attachmentFile = attachmentFile.toString();
         this.attachmentSign = attachmentSign.toString();
+    }
+
+    /**
+     * Метод на основании полученного из ИС УВ запроса генерирует запрос ClientMessage с заполненной секцией RoutingInformation
+     */
+    public void generateESIARequest() throws RequestException {
+        // Сгенерированный ClientMessage сохраняем в каталоге integration/files адаптера, работающего по версии 1.3 схем СМЭВ.
+        // Запросы персональных данных пользователей ЕСИА не помещаются в очереди на отправку по приоритетам, поскольку
+        // отправляются через отдельный instance адаптера.
+        Path targetPath = RequestProcessor.outputDir13;
+
+        // Формируем имя результирующего файла
+        resultFile = targetPath.resolve(requestFile.toPath().getFileName()).toFile();
+
+        // Выполняем преобразование файла ИС УВ в ClientMessage
+        try {
+            XMLTransformer.createESIAClientMessage(requestDOM, resultFile, clientID);
+        } catch (TransformerException e) {
+            LOG.error(e.getMessage());
+            throw new RequestException("Не удалось преобразовать в ClientMessage запрос " + resultFile.getName(), new Exception());
+        }
     }
 
     public File getRequestFile() {
