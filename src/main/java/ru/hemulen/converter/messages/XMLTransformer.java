@@ -1,5 +1,6 @@
 package ru.hemulen.converter.messages;
 
+import com.sun.xml.internal.messaging.saaj.util.FastInfosetReflection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -19,6 +20,8 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.xpath.*;
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 /**
  * Класс, содержащий статические методы для различных преобразований запросов и ответов
@@ -32,6 +35,7 @@ public class XMLTransformer {
     private static final String ToEGRNTechDescStylesheet = "./src/main/resources/EGRNStatement2TechDesc.xslt";
     private static final String ToEGRNMainRequestStylesheet = "./src/main/resources/EGRNStatement2Request.xslt";
     private static final String ToESIAClientMessage = "./src/main/resources/ESIA.xslt";
+    private static final String ToFSSPClientMessage = "./src/main/resources/FSSPStatement2Request.xslt";
     private static Logger LOG = LoggerFactory.getLogger(XMLTransformer.class.getName());
     private static DocumentBuilderFactory factory;
     private static DocumentBuilder builder;
@@ -41,6 +45,7 @@ public class XMLTransformer {
     private static Transformer transformerEGRNToTechDesc;
     private static Transformer transformerEGRNToMainRequest;
     private static Transformer transformerESIAToClientMessage;
+    private static Transformer transformerFSSPToClientMessage;
     private static XPathFactory xpathFactory;
     private static XPath xpath;
 
@@ -76,6 +81,11 @@ public class XMLTransformer {
             File toESIAClientMessageStylesheet = new File(ToESIAClientMessage);
             StreamSource toESIAClientMessageStyleSource = new StreamSource(toESIAClientMessageStylesheet);
             transformerESIAToClientMessage = transformerFactory.newTransformer(toESIAClientMessageStyleSource);
+
+            // Создаем трансформер для преобразования вложения ФССП в ClientMessage
+            File toFSSPClientMessageStylesheet = new File(ToFSSPClientMessage);
+            StreamSource toFSSPClientMessageStyleSource = new StreamSource(toFSSPClientMessageStylesheet);
+            transformerFSSPToClientMessage = transformerFactory.newTransformer(toFSSPClientMessageStyleSource);
 
             // Создаем обработчик XPath запросов
             xpathFactory = XPathFactory.newInstance();
@@ -196,6 +206,20 @@ public class XMLTransformer {
         transformerEGRNToMainRequest.setParameter("fileName", fileName);
         transformerEGRNToMainRequest.setParameter("clientID", clientID);
         transformerEGRNToMainRequest.transform(source, target);
+        return targetFile;
+    }
+
+    public synchronized static File createFSSPClientMessage(File fsspStatement, String clientID) throws ParserConfigurationException, SAXException, IOException, TransformerException, XPathExpressionException {
+        String targetFileName = fsspStatement.getName() + ".cm";
+        File targetFile = RequestProcessor.inputDir.resolve(targetFileName).toFile();
+        StreamResult target = new StreamResult(targetFile);
+        Element fsspDOM = AbstractTools.fileToElement(fsspStatement);
+        DOMSource source = new DOMSource(fsspDOM.getOwnerDocument());
+        String requestDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(Calendar.getInstance().getTime());;
+        transformerFSSPToClientMessage.setParameter("fileName", fsspStatement);
+        transformerFSSPToClientMessage.setParameter("requestDate", requestDate);
+        transformerFSSPToClientMessage.setParameter("clientID", clientID);
+        transformerFSSPToClientMessage.transform(source, target);
         return targetFile;
     }
 

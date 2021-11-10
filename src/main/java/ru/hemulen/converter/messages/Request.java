@@ -298,6 +298,81 @@ public class Request {
         }
     }
 
+    /**
+     * Метод на основании полученного из ИС УВ файла вложения генерирует запрос ClientMessage,
+     * подписывает вложение подписью ЭП-СП, упаковывает вложение в архив, который также подписывается ЭП-СП
+     *
+     * @return
+     */
+    public void generateFSSPRequest() throws RequestException, ParserConfigurationException, SAXException, IOException, SignException {
+        // Копируем файл вложения в каталог для подписания.
+        // Перемещать нельзя, т.к. в каталоге requests должен остаться исходный файл на случай исключений,
+        // после которых он перемещается в каталог failed
+        Path targetPath = RequestProcessor.signDir.resolve(requestFile.toPath().getFileName());
+        try {
+            Files.copy(requestFile.toPath(), targetPath);
+        } catch (IOException e) {
+            // Оставляем запрос в каталоге requests до следующего прохода RequestProcessor'а (возможно не закончилось копирование файла)
+            return;
+        }
+
+        File statement = targetPath.toFile(); // Файл вложения лежит уже в новом каталоге
+        File statementSign;
+        try {
+            statementSign = RequestProcessor.egrnSigner.signPKCS7Detached(statement);
+        } catch (IOException e) {
+            LOG.error(e.getMessage());
+            throw new RequestException(String.format("Файловая проблема с вложением ФССП %s.", statement.getName()), e);
+        } catch (SignatureProcessingException e) {
+            RequestProcessor.isEGRNSignRegistered = false;
+            LOG.error(e.getMessage());
+            throw new SignException(String.format("Не удалось подписать вложение ФССП %s.", statement.getName()), e);
+        }
+        // Вложение и его подпись упаковываются в архив zip c именем, равным clientID запроса
+        // с префиксом "a" (имя файла в схеме СМЭВ должно начинаться с буквы)
+        String archiveName = "a" + clientID;
+        // Создаем новый каталог в base-storage
+        Path attachmentFolder = RequestProcessor.attachmentDir.resolve(archiveName);
+        Path attachmentFile = attachmentFolder.resolve(archiveName + ".zip");
+        try {
+            Files.createDirectory(attachmentFolder);
+            AbstractTools.zipElements(new File[]{statement, statementSign}, attachmentFile.toString());
+        } catch (IOException e) {
+            LOG.error(e.getMessage());
+            throw new RequestException(String.format("Не удалось заархивировать файл вложения ФССП %s.", statement.getName()), e);
+        }
+        // Архив тоже подписывается PKCS7
+        File attachmentSign;
+        try {
+            attachmentSign = RequestProcessor.egrnSigner.signPKCS7Detached(attachmentFile.toFile());
+        } catch (IOException e) {
+            LOG.error(e.getMessage());
+            throw new RequestException(String.format("Файловая проблема с архивом вложений ФССП %s.", statement.getName()), e);
+        } catch (SignatureProcessingException e) {
+            RequestProcessor.isEGRNSignRegistered = false;
+            LOG.error(e.getMessage());
+            throw new SignException(String.format("Не удалось подписать архив вложений ФССП %s.", statement.getName()), e);
+        }
+        // Создаем основной запрос для последующего формирования ClientMessage
+        // При этом исходный файл с заявлением перезаписывается файлом с основным запросом
+        File mainRequestFile;
+        try {
+            mainRequestFile = XMLTransformer.createFSSPClientMessage(this.requestFile, this.clientID);
+            // Перезаписываем исходный файл с заявлением файлом с основным запросом
+            Files.move(mainRequestFile.toPath(), this.requestFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        } catch (ParserConfigurationException | SAXException | IOException | TransformerException | XPathExpressionException e) {
+            LOG.error(e.getMessage());
+            throw new RequestException(String.format("Не удалось сформировать запрос Request для заявления ЕГРН %s.", this.requestFile.getName()), e);
+        }
+
+        // Присваиваем имена сформированных файлов членам класса Request, кроме requestFile,
+        // который был заменен сгенерированным файлом
+        this.requestDOM = AbstractTools.fileToElement(this.requestFile).getOwnerDocument();
+        this.attachmentFile = attachmentFile.toString();
+        this.attachmentSign = attachmentSign.toString();
+
+
+    }
     public File getRequestFile() {
         return requestFile;
     }
