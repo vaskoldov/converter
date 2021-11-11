@@ -216,7 +216,7 @@ public class XMLTransformer {
         Element fsspDOM = AbstractTools.fileToElement(fsspStatement);
         DOMSource source = new DOMSource(fsspDOM.getOwnerDocument());
         String requestDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(Calendar.getInstance().getTime());;
-        transformerFSSPToClientMessage.setParameter("fileName", fsspStatement);
+        transformerFSSPToClientMessage.setParameter("fileName", fsspStatement.getName());
         transformerFSSPToClientMessage.setParameter("requestDate", requestDate);
         transformerFSSPToClientMessage.setParameter("clientID", clientID);
         transformerFSSPToClientMessage.transform(source, target);
