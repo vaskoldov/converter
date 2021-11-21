@@ -357,7 +357,7 @@ public class Request {
         // При этом исходный файл с заявлением перезаписывается файлом с основным запросом
         File mainRequestFile;
         try {
-            mainRequestFile = XMLTransformer.createFSSPClientMessage(this.requestFile, this.clientID);
+            mainRequestFile = XMLTransformer.createFSSPClientMessage(this.requestFile, attachmentFile.toFile(), this.clientID);
             // Перезаписываем исходный файл с заявлением файлом с основным запросом
             Files.move(mainRequestFile.toPath(), this.requestFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
         } catch (ParserConfigurationException | SAXException | IOException | TransformerException | XPathExpressionException e) {

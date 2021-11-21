@@ -209,14 +209,14 @@ public class XMLTransformer {
         return targetFile;
     }
 
-    public synchronized static File createFSSPClientMessage(File fsspStatement, String clientID) throws ParserConfigurationException, SAXException, IOException, TransformerException, XPathExpressionException {
+    public synchronized static File createFSSPClientMessage(File fsspStatement, File attachmentFile, String clientID) throws ParserConfigurationException, SAXException, IOException, TransformerException, XPathExpressionException {
         String targetFileName = fsspStatement.getName() + ".cm";
         File targetFile = RequestProcessor.inputDir.resolve(targetFileName).toFile();
         StreamResult target = new StreamResult(targetFile);
         Element fsspDOM = AbstractTools.fileToElement(fsspStatement);
         DOMSource source = new DOMSource(fsspDOM.getOwnerDocument());
         String requestDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(Calendar.getInstance().getTime());;
-        transformerFSSPToClientMessage.setParameter("fileName", fsspStatement.getName());
+        transformerFSSPToClientMessage.setParameter("fileName", attachmentFile.getName());
         transformerFSSPToClientMessage.setParameter("requestDate", requestDate);
         transformerFSSPToClientMessage.setParameter("clientID", clientID);
         transformerFSSPToClientMessage.transform(source, target);
