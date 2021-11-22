@@ -330,10 +330,12 @@ public class Request {
         }
         // Вложение и его подпись упаковываются в архив zip c именем, равным clientID запроса
         // с префиксом "a" (имя файла в схеме СМЭВ должно начинаться с буквы)
-        String archiveName = "a" + clientID;
+        String archiveName = this.requestFile.getName();
+        // Заменяем расширение .xml на .zip
+        archiveName = archiveName.replaceFirst(".xml", ".zip");
         // Создаем новый каталог в base-storage
-        Path attachmentFolder = RequestProcessor.attachmentDir.resolve(archiveName);
-        Path attachmentFile = attachmentFolder.resolve(archiveName + ".zip");
+        Path attachmentFolder = RequestProcessor.attachmentDir.resolve("a" + clientID);
+        Path attachmentFile = attachmentFolder.resolve(archiveName);
         try {
             Files.createDirectory(attachmentFolder);
             AbstractTools.zipElements(new File[]{statement, statementSign}, attachmentFile.toString());
