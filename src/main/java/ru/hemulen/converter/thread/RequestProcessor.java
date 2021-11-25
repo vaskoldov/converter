@@ -296,6 +296,25 @@ public class RequestProcessor extends Thread {
                                 request.generateESIARequest();
                                 request.log();
                                 break;
+                            case "ФССП":
+                                if (isEGRNSignRegistered) {
+                                    try {
+                                        request.generateFSSPRequest();
+                                        file = request.getRequestFile();
+
+                                    } catch (IOException e) {
+                                        throw new RequestException(String.format("Не удалось переместить вложение ФССП %s из каталога requests.", file.getName()), new Exception());
+                                    } catch (ParserConfigurationException | SAXException e) {
+                                        throw new RequestException(String.format("Не удалось обработать вложение ФССП %s.", file.getName()), new Exception());
+                                    }
+                                    request.process();
+                                    request.log();
+                                    clearSignDir();
+                                    break;
+                                }
+                                else {
+                                    throw new SignException(String.format("Подпись ЕГРН не инициализирована. Файл с вложением ФССП %s не обработан.", file.getName()), new Exception());
+                                }
                             default:
                                 // Преобразуем запрос в ClientMessage
                                 request.process();
