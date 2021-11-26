@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 import ru.hemulen.crypto.DigitalSignatureFactory;
-import ru.hemulen.converter.db.PG;
+import ru.hemulen.converter.db.ConverterDB;
 import ru.hemulen.converter.exceptions.OverlimitException;
 import ru.hemulen.converter.exceptions.ParsingException;
 import ru.hemulen.converter.exceptions.RequestException;
@@ -46,7 +46,7 @@ public class RequestProcessor extends Thread {
     private Boolean isRunnable;
     private long sleepTime;                 // Время задержки перед следующим опросом каталога, если он оказывается пуст
     public static Calendar currentDate;     // Вспомогательная переменная для определения начала нового дня
-    public static PG dbConnection;          // Подключение к БД PostgreSQL со счетчиками, логами и прочим
+    public static ConverterDB dbConnection; // Подключение к БД PostgreSQL со счетчиками, логами и прочим
     public static Path inputDir;            // Каталог, откуда забираются запросы ИС УВ на обработку
     public static Path processedDir;        // Каталог, куда складываются обработанные запросы ИС УВ
     public static Path failedDir;           // Каталог, куда складываются запросы ИС УВ, при обработке которых возникло исключение
@@ -73,7 +73,7 @@ public class RequestProcessor extends Thread {
         // Устанавливаем имя потока
         setName("RequestProcessorThread");
         // Устанавливаем подключение к БД
-        dbConnection = new PG(props);
+        dbConnection = new ConverterDB(props);
         LOG.info("Создано подключение к PostgreSQL.");
 
         // Устанавливаем текущую дату

@@ -2,7 +2,7 @@ package ru.hemulen.converter.thread;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.hemulen.converter.db.PG;
+import ru.hemulen.converter.db.ConverterDB;
 import ru.hemulen.converter.exceptions.AttachmentException;
 import ru.hemulen.converter.exceptions.ParsingException;
 import ru.hemulen.converter.exceptions.ResponseException;
@@ -27,7 +27,7 @@ import java.util.Properties;
  */
 public class ResponseProcessor extends Thread {
     private static Logger LOG = LoggerFactory.getLogger(ResponseProcessor.class.getName());
-    public static PG dbConnection;  // Отдельное подключение к БД PostgreSQL для обработчика ответов
+    public static ConverterDB dbConnection;  // Отдельное подключение к БД PostgreSQL для обработчика ответов
     private Boolean isRunnable;
     private long sleepTime;         // Время задержки перед следующим опросом каталога, если он оказывается пуст
     private Path inputDir;          // Каталог, в который адаптер помещает ответы СМЭВ (IN)
@@ -47,7 +47,7 @@ public class ResponseProcessor extends Thread {
         // Запуск процесса настраивается в конфигурации
         isRunnable = Boolean.parseBoolean(props.getProperty("RESPONSE_PROCESSOR"));
         // Подключаемся к базе данных
-        dbConnection = new PG(props);
+        dbConnection = new ConverterDB(props);
         LOG.info("Создано подключение к PostgreSQL.");
         // Частота опроса каталога IN
         sleepTime = Long.parseLong(props.getProperty("RESPONSE_FREQ"));

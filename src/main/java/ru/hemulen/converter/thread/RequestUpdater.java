@@ -3,8 +3,8 @@ package ru.hemulen.converter.thread;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.hemulen.converter.db.Adapter13DB;
-import ru.hemulen.converter.db.H2;
-import ru.hemulen.converter.db.PG;
+import ru.hemulen.converter.db.AdapterDB;
+import ru.hemulen.converter.db.ConverterDB;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -14,9 +14,9 @@ import java.util.Properties;
 public class RequestUpdater extends Thread {
     private static Logger LOG = LoggerFactory.getLogger(RequestUpdater.class.getName());
     private boolean isRunnable;
-    private H2 h2Db;
+    private AdapterDB adapterDB;
     private Adapter13DB adapter13DB;
-    private PG pgDb;
+    private ConverterDB pgDb;
     private long sleepTime;
     private Timestamp lastUpdateTime;
 
@@ -24,11 +24,11 @@ public class RequestUpdater extends Thread {
         // Устанавливаем имя потока
         setName("RequestUpdaterThread");
         isRunnable = Boolean.parseBoolean(props.getProperty("REQUEST_UPDATER"));
-        h2Db = new H2(props);
+        adapterDB = new AdapterDB(props);
         LOG.info("Создано подключение к БД первого instance адаптера.");
         adapter13DB = new Adapter13DB(props);
         LOG.info("Создано подключение к БД второго instance адаптера.");
-        pgDb = new PG(props);
+        pgDb = new ConverterDB(props);
         LOG.info("Создано подключение к PostgreSQL.");
         sleepTime = Long.parseLong(props.getProperty("REQUEST_FREQ"));
         // Извлекаем из БД postgres время последнего обновления запросов
@@ -46,7 +46,7 @@ public class RequestUpdater extends Thread {
         while (isRunnable) {
             try {
                 // Получаем из базы первого instance адаптера все запросы, отправленные с момента последнего обновления
-                ResultSet result = h2Db.getRequests(lastUpdateTime);
+                ResultSet result = adapterDB.getRequests(lastUpdateTime);
                 // Получаем из базы второго instance адаптера все запросы, отправленные с момента последнего обновления
                 ResultSet result13 = adapter13DB.getRequests(lastUpdateTime);
                 // Обновляем в PHP-адаптере message_id, send_timestamp и status всех обработанных запросов

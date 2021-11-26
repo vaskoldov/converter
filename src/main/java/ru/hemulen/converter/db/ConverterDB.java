@@ -12,8 +12,8 @@ import java.util.Properties;
  * хранится некая служебная информация.
  * Все запросы к PostgreSQL выполняются методами класса.
  */
-public class PG implements AutoCloseable {
-    private static Logger LOG = LoggerFactory.getLogger(PG.class.getName());
+public class ConverterDB implements AutoCloseable {
+    private static Logger LOG = LoggerFactory.getLogger(ConverterDB.class.getName());
     Connection connection = null;
     String schema;
     PreparedStatement requestsPS = null;
@@ -25,7 +25,7 @@ public class PG implements AutoCloseable {
      * запросов и ответов в таблице log.
      * @param props Параметры подключения к базе PostgreSQL.
      */
-    public PG(Properties props) {
+    public ConverterDB(Properties props) {
         String pgURL = "jdbc:postgresql://" + props.getProperty("PG_HOST") + ":" + props.getProperty("PG_PORT") + "/" + props.getProperty("PG_DB");
         try {
             Class.forName("org.postgresql.Driver");

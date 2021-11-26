@@ -3,58 +3,27 @@ package ru.hemulen.converter.db;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.sql.*;
 import java.util.Properties;
 
-public class H2 implements AutoCloseable {
-    private static Logger LOG = LoggerFactory.getLogger(H2.class.getName());
+public class AdapterDB implements AutoCloseable {
+    private static Logger LOG = LoggerFactory.getLogger(AdapterDB.class.getName());
     Connection connection = null;
 
-    public H2(Properties props) {
-        String dbType = props.getProperty("DB_TYPE");
-        switch (dbType) {
-            case "H2":
-                // Подключаемся к файлу БД H2
-                String h2Path = props.getProperty("ADAPTER_PATH") + File.separator +
-                        "data" + File.separator +
-                        props.getProperty("VERSION") + File.separator
-                        + "db" + File.separator + "adapter";
-                String h2URL = "jdbc:h2:file:" + h2Path + ";IFEXISTS=TRUE;AUTO_SERVER=TRUE";
-                try {
-                    Class.forName("org.h2.Driver");
-                } catch (ClassNotFoundException e) {
-                    LOG.error("Не удалось найти JDBC-драйвер ru.hemulen.h2pgsql.db.H2");
-                    LOG.error(e.getMessage());
-                    System.exit(2);
-                }
-                try {
-                    connection = DriverManager.getConnection(h2URL, "adapter", "p@$$w0rd");
-                } catch (SQLException e) {
-                    LOG.error("Не удалось установить соединение с базой ru.hemulen.h2pgsql.db.H2!");
-                    LOG.error(e.getMessage());
-                    System.exit(2);
-                }
-                break;
-            case "PG":
-                // Подключаемся к БД PostgreSQL
-                String pgURL = "jdbc:postgresql://" + props.getProperty("DB_HOST") + ":" + props.getProperty("DB_PORT") + "/" + props.getProperty("DB_DB");
-                try {
-                    Class.forName("org.postgresql.Driver");
-                    connection = DriverManager.getConnection(pgURL, props.getProperty("DB_USER"), props.getProperty("DB_PASS"));
-                } catch (ClassNotFoundException e) {
-                    LOG.error("Не найден драйвер PostgreSQL!");
-                    LOG.error(e.getMessage());
-                    System.exit(2);
-                } catch (SQLException e) {
-                    LOG.error("Не удалось установить соединение с базой PostgreSQL адаптера!");
-                    LOG.error(e.getMessage());
-                    System.exit(2);
-                }
-                break;
-            default:
-                LOG.error("Некорректный тип СУБД адаптера. Допустимые значения: H2 и PG.");
-                System.exit(2);
+    public AdapterDB(Properties props) {
+        // Подключаемся к БД PostgreSQL
+        String pgURL = "jdbc:postgresql://" + props.getProperty("DB_HOST") + ":" + props.getProperty("DB_PORT") + "/" + props.getProperty("DB_DB");
+        try {
+            Class.forName("org.postgresql.Driver");
+            connection = DriverManager.getConnection(pgURL, props.getProperty("DB_USER"), props.getProperty("DB_PASS"));
+        } catch (ClassNotFoundException e) {
+            LOG.error("Не найден драйвер PostgreSQL!");
+            LOG.error(e.getMessage());
+            System.exit(2);
+        } catch (SQLException e) {
+            LOG.error("Не удалось установить соединение с базой PostgreSQL адаптера!");
+            LOG.error(e.getMessage());
+            System.exit(2);
         }
     }
 

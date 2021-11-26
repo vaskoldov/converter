@@ -13,46 +13,18 @@ public class Adapter13DB implements AutoCloseable {
     Connection connection = null;
 
     public Adapter13DB(Properties props) {
-        String dbType = props.getProperty("DB_TYPE");
-        switch (dbType) {
-            case "H2":
-                // Подключаемся к файлу БД H2
-                String h2Path = Paths.get(props.getProperty("ADAPTER_1_3_PATH"), "data", props.getProperty("VERSION"), "db", "adapter" ).toString();
-                String h2URL = "jdbc:h2:file:" + h2Path + ";IFEXISTS=TRUE;AUTO_SERVER=TRUE";
-                try {
-                    Class.forName("org.h2.Driver");
-                } catch (ClassNotFoundException e) {
-                    LOG.error("Не удалось найти JDBC-драйвер ru.hemulen.h2pgsql.db.H2");
-                    LOG.error(e.getMessage());
-                    System.exit(2);
-                }
-                try {
-                    connection = DriverManager.getConnection(h2URL, "adapter", "p@$$w0rd");
-                } catch (SQLException e) {
-                    LOG.error("Не удалось установить соединение с базой данных второго instance адаптера!");
-                    LOG.error(e.getMessage());
-                    System.exit(2);
-                }
-                break;
-            case "PG":
-                // Подключаемся к БД PostgreSQL второго instance адаптера
-                String pgURL = "jdbc:postgresql://" + props.getProperty("DB13_HOST") + ":" + props.getProperty("DB13_PORT") + "/" + props.getProperty("DB13_DB");
-                try {
-                    Class.forName("org.postgresql.Driver");
-                    connection = DriverManager.getConnection(pgURL, props.getProperty("DB13_USER"), props.getProperty("DB13_PASS"));
-                } catch (ClassNotFoundException e) {
-                    LOG.error("Не найден драйвер PostgreSQL!");
-                    LOG.error(e.getMessage());
-                    System.exit(2);
-                } catch (SQLException e) {
-                    LOG.error("Не удалось установить соединение с базой PostgreSQL второго instance адаптера!");
-                    LOG.error(e.getMessage());
-                    System.exit(2);
-                }
-                break;
-            default:
-                LOG.error("Некорректный тип СУБД адаптера. Допустимые значения: H2 и PG.");
-                System.exit(2);
+        String pgURL = "jdbc:postgresql://" + props.getProperty("DB13_HOST") + ":" + props.getProperty("DB13_PORT") + "/" + props.getProperty("DB13_DB");
+        try {
+            Class.forName("org.postgresql.Driver");
+            connection = DriverManager.getConnection(pgURL, props.getProperty("DB13_USER"), props.getProperty("DB13_PASS"));
+        } catch (ClassNotFoundException e) {
+            LOG.error("Не найден драйвер PostgreSQL!");
+            LOG.error(e.getMessage());
+            System.exit(2);
+        } catch (SQLException e) {
+            LOG.error("Не удалось установить соединение с базой PostgreSQL второго instance адаптера!");
+            LOG.error(e.getMessage());
+            System.exit(2);
         }
     }
 

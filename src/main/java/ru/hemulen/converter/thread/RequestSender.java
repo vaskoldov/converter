@@ -26,7 +26,6 @@ public class RequestSender extends Thread {
         isRunnable = Boolean.parseBoolean(props.getProperty("REQUEST_SENDER"));
         preparedDir = Paths.get(props.getProperty("EXCHANGE_PATH")).resolve("prepared");
         outputDir = Paths.get(props.getProperty("INTEGRATION_OUT"));
-        //outputDir = Paths.get(props.getProperty("ADAPTER_PATH"), "integration", "files", props.getProperty("MNEMONIC"), "out");
         LOG.info("Инициализированы каталог подготовленных запросов и каталог отправки адаптера.");
         LOG.info("RequestSender инициализирован.");
     }
