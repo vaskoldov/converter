@@ -92,14 +92,7 @@ public class RequestProcessor extends Thread {
         // Запуск процесса настраивается в конфигурации
         isRunnable = Boolean.parseBoolean(props.getProperty("REQUEST_PROCESSOR"));
 
-        // Обрабатываем параметр каталога СМЭВ-адаптера и все связанные с ним каталоги.
-        // Для СМЭВ-адаптера никакие каталоги автоматически не создаются - если чего-то не хватает,
-        // то пусть разбираются вне приложения, а оно просто завершает работу
-        if (!Files.exists(Paths.get(props.getProperty("ADAPTER_PATH")))) {
-            // Если в параметре передан некорректный каталог, то прекращаем работу приложения
-            LOG.error("В настройках указан некорректный каталог СМЭВ-адаптера. Работа завершается.");
-            System.exit(1);
-        }
+        // Каталог для обмена сообщениями с ИС УВ и для обработки запросов
         outputDir = Paths.get(props.getProperty("EXCHANGE_PATH"), "prepared");
         if (!Files.exists(outputDir)) {
             try {
@@ -112,7 +105,8 @@ public class RequestProcessor extends Thread {
         // Запросы персональных данных пользователей ЕСИА помещаются сразу в выходной каталог второго instance адаптера, минуя очереди по приоритетам
         outputDir13 = Paths.get(props.getProperty("ADAPTER_1_3_PATH"), "integration", "files", props.getProperty("MNEMONIC"), "out");
 
-        attachmentDir = Paths.get(props.getProperty("ADAPTER_PATH"), "local-storage");
+        // Каталог для отправки вложений в адаптер (может создаваться автоматически, если указанный в параметрах каталог не существует)
+        attachmentDir = Paths.get(props.getProperty("LOCAL_ATTACHMENT_OUT"));
         if (!Files.exists(attachmentDir)) {
             try {
                 Files.createDirectories(attachmentDir);

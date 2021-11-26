@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
@@ -26,7 +25,8 @@ public class RequestSender extends Thread {
         // Запуск процесса настраивается в конфигурации
         isRunnable = Boolean.parseBoolean(props.getProperty("REQUEST_SENDER"));
         preparedDir = Paths.get(props.getProperty("EXCHANGE_PATH")).resolve("prepared");
-        outputDir = Paths.get(props.getProperty("ADAPTER_PATH"), "integration", "files", props.getProperty("MNEMONIC"), "out");
+        outputDir = Paths.get(props.getProperty("INTEGRATION_OUT"));
+        //outputDir = Paths.get(props.getProperty("ADAPTER_PATH"), "integration", "files", props.getProperty("MNEMONIC"), "out");
         LOG.info("Инициализированы каталог подготовленных запросов и каталог отправки адаптера.");
         LOG.info("RequestSender инициализирован.");
     }

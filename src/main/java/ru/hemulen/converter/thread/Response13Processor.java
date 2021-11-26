@@ -19,7 +19,7 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 /**
- * Класс выполняет сканирование каталога с ответами адаптера, определенного в параметре ADAPTER_PATH конфигурации.
+ * Класс выполняет сканирование каталога с ответами адаптера, определенного в параметре INTEGRATION_IN_13 конфигурации.
  * Каждый обнаруженный в каталоге файл передается на обработку, в ходе которой из файла извлекается бизнес-часть ответа
  * и сохраняется в каталоге ИС УВ, определенном в параметре EXCHANGE_PATH конфигурации.
  * Если обработка завершилась успешно, то файл перемещается в подкаталог processed.
@@ -50,13 +50,8 @@ public class Response13Processor extends Thread {
         // Частота опроса каталога IN
         sleepTime = Long.parseLong(props.getProperty("RESPONSE_FREQ"));
         // Настраиваем каталоги
-        if (!Files.exists(Paths.get(props.getProperty("ADAPTER_1_3_PATH")))) {
-            // Если в параметре передан некорректный каталог, то прекращаем работу приложения
-            LOG.error("В настройках указан некорректный каталог второго instance СМЭВ-адаптера. Работа завершается.");
-            System.exit(1);
-        }
-        inputDir = Paths.get(props.getProperty("ADAPTER_1_3_PATH"), "integration", "files", props.getProperty("MNEMONIC"), "in");
-        attachmentDir = Paths.get(props.getProperty("ADAPTER_1_3_PATH"), "data", props.getProperty("VERSION"), "base-storage", "in");
+        inputDir = Paths.get(props.getProperty("INTEGRATION_IN_13"));
+        attachmentDir = Paths.get(props.getProperty("BASE_ATTACHMENT_IN_13"));
         outputDir = Paths.get(props.getProperty("EXCHANGE_PATH"), "responses");
         requestsDir = Paths.get(props.getProperty("EXCHANGE_PATH"), "requests");
         processedRequestsDir = requestsDir.resolve("processed");

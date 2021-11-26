@@ -19,7 +19,7 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 /**
- * Класс выполняет сканирование каталога с ответами адаптера, определенного в параметре ADAPTER_PATH конфигурации.
+ * Класс выполняет сканирование каталога с ответами адаптера, определенного в параметре INTEGRATION_IN конфигурации.
  * Каждый обнаруженный в каталоге файл передается на обработку, в ходе которой из файла извлекается бизнес-часть ответа
  * и сохраняется в каталоге ИС УВ, определенном в параметре EXCHANGE_PATH конфигурации.
  * Если обработка завершилась успешно, то файл перемещается в подкаталог processed.
@@ -35,11 +35,11 @@ public class ResponseProcessor extends Thread {
     public static Path attachmentDir;      // Каталог, в который адаптер помещает файлы вложений
     public static Path attachmentDir13;    // Каталог, в который второй instance адаптера помещает файлы вложений
     public static Path outputDir;   // Каталог, из которого ответы забирает ИС УВ (responses)
-    private Path processedDir;      // Каталог, в который складываются обработанные ответы
-    private Path failedDir;         // Каталог, в который складываются ответы, при обработке которых возникло исключение
+    private Path processedDir;      // Каталог для обработанных ответов
+    private Path failedDir;         // Каталог для ответов, при обработке которых возникло исключение
     private Path requestsDir;       // Каталог с исходными запросами
     public static Path processedRequestsDir;    // Каталог с отправленными запросами
-    public static Path errorDir;    // Каталог, в который перемещаются запросы, на которые из СМЭВ пришла ошибка
+    public static Path errorDir;    // Каталог для запросов, на которые из СМЭВ пришла ошибка
 
     public ResponseProcessor(Properties props) {
         // Устанавливаем имя потока
@@ -51,16 +51,10 @@ public class ResponseProcessor extends Thread {
         LOG.info("Создано подключение к PostgreSQL.");
         // Частота опроса каталога IN
         sleepTime = Long.parseLong(props.getProperty("RESPONSE_FREQ"));
-        // Настраиваем каталоги
-        if (!Files.exists(Paths.get(props.getProperty("ADAPTER_PATH")))) {
-            // Если в параметре передан некорректный каталог, то прекращаем работу приложения
-            LOG.error("В настройках указан некорректный каталог СМЭВ-адаптера. Работа завершается.");
-            System.exit(1);
-        }
-        inputDir = Paths.get(props.getProperty("ADAPTER_PATH"), "integration", "files", props.getProperty("MNEMONIC"), "in");
-        inputDir13 = Paths.get(props.getProperty("ADAPTER_1_3_PATH"), "integration", "files", props.getProperty("MNEMONIC"), "in");
-        attachmentDir = Paths.get(props.getProperty("ADAPTER_PATH"), "data", props.getProperty("VERSION"), "base-storage", "in");
-        attachmentDir13 = Paths.get(props.getProperty("ADAPTER_1_3_PATH"),"data", props.getProperty("VERSION"), "base-storage", "in");
+        inputDir = Paths.get(props.getProperty("INTEGRATION_IN"));
+        inputDir13 = Paths.get(props.getProperty("INTEGRATION_IN_13"));
+        attachmentDir = Paths.get(props.getProperty("BASE_ATTACHMENT_IN"));
+        attachmentDir13 = Paths.get(props.getProperty("BASE_ATTACHMENT_IN_13"));
         outputDir = Paths.get(props.getProperty("EXCHANGE_PATH"), "responses");
         requestsDir = Paths.get(props.getProperty("EXCHANGE_PATH"), "requests");
         processedRequestsDir = requestsDir.resolve("processed");
