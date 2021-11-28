@@ -1,6 +1,6 @@
 package ru.hemulen.converter.messages;
 
-import com.sun.xml.internal.messaging.saaj.util.FastInfosetReflection;
+//import com.sun.xml.internal.messaging.saaj.util.FastInfosetReflection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;

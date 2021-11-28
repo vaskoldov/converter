@@ -9,9 +9,18 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Properties;
+import java.nio.file.attribute.PosixFilePermission;
+import java.util.*;
+
+import static java.nio.file.attribute.PosixFilePermission.OWNER_READ;
+import static java.nio.file.attribute.PosixFilePermission.OWNER_WRITE;
+import static java.nio.file.attribute.PosixFilePermission.OWNER_EXECUTE;
+import static java.nio.file.attribute.PosixFilePermission.GROUP_READ;
+import static java.nio.file.attribute.PosixFilePermission.GROUP_WRITE;
+import static java.nio.file.attribute.PosixFilePermission.GROUP_EXECUTE;
+import static java.nio.file.attribute.PosixFilePermission.OTHERS_READ;
+import static java.nio.file.attribute.PosixFilePermission.OTHERS_WRITE;
+import static java.nio.file.attribute.PosixFilePermission.OTHERS_EXECUTE;
 
 public class RequestSender extends Thread {
     private static Logger LOG = LoggerFactory.getLogger(RequestSender.class.getName());
@@ -57,7 +66,7 @@ public class RequestSender extends Thread {
         }
         File[] files = priorityDir.toFile().listFiles();
         if (files.length == 0) {
-            return;
+            return; // Каталог есть, но он пустой
         }
         // Создаем хранилище для проблемных файлов
         List<File> deniedFiles = new LinkedList<>();
@@ -67,6 +76,7 @@ public class RequestSender extends Thread {
             Path target = outputDir.resolve(file.toPath().getFileName());
             try {
                 Files.move(source, target);
+                SetPermissions(target); // Явно прописываем права доступа, чтобы адаптер смог прочитать наш запрос
             } catch (IOException e) {
                 // Собираем в кучку файлы, которые не удалось переместить с первого раза
                 deniedFiles.add(file);
@@ -93,5 +103,22 @@ public class RequestSender extends Thread {
         File[] files = outputDir.toFile().listFiles();
         // В каталоге out еще два подкаталога - sent и error
         return files.length <= 2;
+    }
+
+    /**
+     * Метод изменяет права доступа к файлу запроса, помещаемому в каталог адаптера
+     */
+    private Path SetPermissions(Path target) throws IOException {
+        Set<PosixFilePermission> perms =
+                EnumSet.of(OWNER_READ,
+                        OWNER_WRITE,
+                        OWNER_EXECUTE,
+                        GROUP_READ,
+                        GROUP_WRITE,
+                        GROUP_EXECUTE,
+                        OTHERS_READ,
+                        OTHERS_WRITE,
+                        OTHERS_EXECUTE);
+        return Files.setPosixFilePermissions(target, perms);
     }
 }
