@@ -103,7 +103,7 @@ public class RequestProcessor extends Thread {
             System.exit(1);
         }
         // Запросы персональных данных пользователей ЕСИА помещаются сразу в выходной каталог второго instance адаптера, минуя очереди по приоритетам
-        outputDir13 = Paths.get(props.getProperty("ADAPTER_1_3_PATH"), "integration", "files", props.getProperty("MNEMONIC"), "out");
+        outputDir13 = Paths.get(props.getProperty("INTEGRATION_OUT_13"));
 
         // Каталог для отправки вложений в адаптер (может создаваться автоматически, если указанный в параметрах каталог не существует)
         attachmentDir = Paths.get(props.getProperty("LOCAL_ATTACHMENT_OUT"));

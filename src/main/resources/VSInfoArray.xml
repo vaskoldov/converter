@@ -339,7 +339,19 @@
 		<keywords>/*[local-name()="IRequestOther"]/*[local-name()="DebtorName"]/text()</keywords>
 		<keywords>/*[local-name()="IRequestOther"]/*[local-name()="DebtorINN"]/text()</keywords>
 	</vsInfoEntry>
-
+	<vsInfoEntry>
+		<namespace>urn://mvd/guvm/passport-dossier/1.1.0</namespace>
+		<name>Паспорта гражданина РФ</name>
+		<timeout>30</timeout>
+		<dailyLimit>70000</dailyLimit>
+		<priority>250</priority>
+		<keywords>/*[local-name()="passportDossierRequest"]/*[local-name()="person"]/*[local-name()="lastName"]/text()</keywords>
+		<keywords>/*[local-name()="passportDossierRequest"]/*[local-name()="person"]/*[local-name()="firstName"]/text()</keywords>
+		<keywords>/*[local-name()="passportDossierRequest"]/*[local-name()="person"]/*[local-name()="middleName"]/text()</keywords>
+		<keywords>/*[local-name()="passportDossierRequest"]/*[local-name()="person"]/*[local-name()="birthDate"]/text()</keywords>
+		<keywords>/*[local-name()="passportDossierRequest"]/*[local-name()="passport"]/*[local-name()="series"]/text()</keywords>
+		<keywords>/*[local-name()="passportDossierRequest"]/*[local-name()="passport"]/*[local-name()="number"]/text()</keywords>
+	</vsInfoEntry>
 	<!-- 
 ================= Неиспользуемые виды сведений =================
 	<vsInfoEntry>
