@@ -340,6 +340,16 @@
 		<keywords>/*[local-name()="IRequestOther"]/*[local-name()="DebtorINN"]/text()</keywords>
 	</vsInfoEntry>
 	<vsInfoEntry>
+		<namespace>http://www.fssprus.ru/namespace/IRequestOther/2021/1</namespace>
+		<name>ФССП</name>
+		<timeout>30</timeout>
+		<dailyLimit>70000</dailyLimit>
+		<priority>290</priority>
+		<keywords>/*[local-name()="IRequestOther"]/*[local-name()="DocType"]/text()</keywords>
+		<keywords>/*[local-name()="IRequestOther"]/*[local-name()="DebtorName"]/text()</keywords>
+		<keywords>/*[local-name()="IRequestOther"]/*[local-name()="DebtorINN"]/text()</keywords>
+	</vsInfoEntry>
+	<vsInfoEntry>
 		<namespace>urn://mvd/guvm/passport-dossier/1.1.0</namespace>
 		<name>Паспорта гражданина РФ</name>
 		<timeout>30</timeout>
@@ -351,6 +361,13 @@
 		<keywords>/*[local-name()="passportDossierRequest"]/*[local-name()="person"]/*[local-name()="birthDate"]/text()</keywords>
 		<keywords>/*[local-name()="passportDossierRequest"]/*[local-name()="passport"]/*[local-name()="series"]/text()</keywords>
 		<keywords>/*[local-name()="passportDossierRequest"]/*[local-name()="passport"]/*[local-name()="number"]/text()</keywords>
+	</vsInfoEntry>
+	<vsInfoEntry>
+		<namespace>urn://fake/1.1.0</namespace>
+		<name>Заглушка для исправления отправки запросов с max приоритетом</name>
+		<timeout>30</timeout>
+		<dailyLimit>0</dailyLimit>
+		<priority>300</priority>
 	</vsInfoEntry>
 	<!-- 
 ================= Неиспользуемые виды сведений =================
