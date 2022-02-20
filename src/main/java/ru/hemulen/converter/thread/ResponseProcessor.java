@@ -35,6 +35,7 @@ public class ResponseProcessor extends Thread {
     public static Path attachmentDir;      // Каталог, в который адаптер помещает файлы вложений
     public static Path attachmentDir13;    // Каталог, в который второй instance адаптера помещает файлы вложений
     public static Path outputDir;   // Каталог, из которого ответы забирает ИС УВ (responses)
+    public static Path integrationOut;  // Каталог адаптера, из которого он отправляет ответы (для ответа в ФССП)
     private Path processedDir;      // Каталог для обработанных ответов
     private Path failedDir;         // Каталог для ответов, при обработке которых возникло исключение
     private Path requestsDir;       // Каталог с исходными запросами
@@ -52,6 +53,7 @@ public class ResponseProcessor extends Thread {
         // Частота опроса каталога IN
         sleepTime = Long.parseLong(props.getProperty("RESPONSE_FREQ"));
         inputDir = Paths.get(props.getProperty("INTEGRATION_IN"));
+        integrationOut = Paths.get(props.getProperty("INTEGRATION_OUT"));
         inputDir13 = Paths.get(props.getProperty("INTEGRATION_IN_13"));
         attachmentDir = Paths.get(props.getProperty("BASE_ATTACHMENT_IN"));
         attachmentDir13 = Paths.get(props.getProperty("BASE_ATTACHMENT_IN_13"));

@@ -37,6 +37,8 @@ public class XMLTransformer {
     private static final String ToESIAClientMessage = "./src/main/resources/ESIA.xslt";
     private static final String ToFSSPRequest = "./src/main/resources/FSSPStatement2Request.xslt";
     private static final String SplitFSSPRequest = "./src/main/resources/SplitFSSPRequest.xslt";
+    private static final String ToFSSPResponse = "./src/main/resources/AnswerToFSSPRequest.xslt";
+
     private static Logger LOG = LoggerFactory.getLogger(XMLTransformer.class.getName());
     private static DocumentBuilderFactory factory;
     private static DocumentBuilder builder;
@@ -48,6 +50,7 @@ public class XMLTransformer {
     private static Transformer transformerESIAToClientMessage;
     private static Transformer transformerFSSPToRequest;
     private static Transformer transformerFSSPRequestToResponse;
+    private static Transformer transformerAnswerFSSPRequest;
     private static XPathFactory xpathFactory;
     private static XPath xpath;
 
@@ -93,6 +96,11 @@ public class XMLTransformer {
             File splitFSSPRequestStylesheet = new File(SplitFSSPRequest);
             StreamSource splitFSSPRequestStyleSource = new StreamSource(splitFSSPRequestStylesheet);
             transformerFSSPRequestToResponse = transformerFactory.newTransformer(splitFSSPRequestStyleSource);
+
+            // Создаем трансформер для формирования ответа ФССП
+            File AnswerFSSPRequestStylesheet = new File(ToFSSPResponse);
+            StreamSource AnswerFSSPRequestStyleSource = new StreamSource(AnswerFSSPRequestStylesheet);
+            transformerAnswerFSSPRequest = transformerFactory.newTransformer(AnswerFSSPRequestStyleSource);
 
             // Создаем обработчик XPath запросов
             xpathFactory = XPathFactory.newInstance();
@@ -222,7 +230,7 @@ public class XMLTransformer {
         StreamResult target = new StreamResult(targetFile);
         Element fsspDOM = AbstractTools.fileToElement(fsspStatement);
         DOMSource source = new DOMSource(fsspDOM.getOwnerDocument());
-        String requestDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(Calendar.getInstance().getTime());;
+        String requestDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(Calendar.getInstance().getTime());
         transformerFSSPToRequest.setParameter("fileName", attachmentFile.getName());
         transformerFSSPToRequest.setParameter("requestDate", requestDate);
         transformerFSSPToRequest.setParameter("clientID", clientID);
@@ -330,5 +338,15 @@ public class XMLTransformer {
         transformerFSSPRequestToResponse.setParameter("DocKey", docKey);
         transformerFSSPRequestToResponse.transform(source, target);
         return target.getWriter().toString();
+    }
+
+    public static File answerFSSPRequest(File request, File targetFile) throws IOException, ParserConfigurationException, SAXException, TransformerException {
+        String currentTimestamp = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(Calendar.getInstance().getTime());
+        transformerAnswerFSSPRequest.setParameter("Timestamp", currentTimestamp);
+        StreamResult target = new StreamResult(targetFile);
+        Element fsspDOM = AbstractTools.fileToElement(request);
+        DOMSource source = new DOMSource(fsspDOM.getOwnerDocument());
+        transformerAnswerFSSPRequest.transform(source, target);
+        return targetFile;
     }
 }

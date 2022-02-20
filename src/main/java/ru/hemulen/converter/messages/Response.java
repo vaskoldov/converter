@@ -13,6 +13,7 @@ import ru.hemulen.converter.exceptions.ResponseException;
 import ru.hemulen.converter.thread.ResponseProcessor;
 import ru.hemulen.converter.thread.Response13Processor;
 
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.xpath.*;
 import java.io.*;
@@ -25,6 +26,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -464,13 +466,21 @@ public class Response {
         }
     }
 
-    public void processFSSPRequest() {
+    public void processFSSPRequest() throws ResponseException {
         Element root = responseDOM.getDocumentElement();
         NodeList documentNodes = root.getElementsByTagNameNS("urn://x-artifacts-fssp-ru/mvv/smev3/container/1.1.0", "Document");
         for (int i = 0; i < documentNodes.getLength(); i++) {
             processDocument(documentNodes.item(i));
         }
-        //TODO Отправить ответ на запрос
+        //Отправляем ответ на запрос
+        // Файл с именем UUID помещаем в каталог /opt/adapter/integration/files/FSOR01_3S/out
+        File targetFile = ResponseProcessor.integrationOut.resolve(UUID.randomUUID().toString() + ".xml").toFile();
+        File sourceFile = ResponseProcessor.inputDir.resolve(responseFile.getName()).toFile();
+        try {
+            XMLTransformer.answerFSSPRequest(sourceFile, targetFile);
+        } catch (IOException | ParserConfigurationException | SAXException | TransformerException e) {
+            throw new ResponseException("Ошибка формирования ответа на запрос ФССП.", new Exception());
+        }
     }
 
     private void processDocument(Node documentNode) {

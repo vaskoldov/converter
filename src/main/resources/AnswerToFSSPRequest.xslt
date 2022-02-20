@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:fssp="urn://x-artifacts-fssp-ru/mvv/smev3/application-documents/1.1.1" xmlns:c="urn://x-artifacts-fssp-ru/mvv/smev3/container/1.1.0">
+<xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:fssp="urn://x-artifacts-fssp-ru/mvv/smev3/application-documents/1.1.1" xmlns:c="urn://x-artifacts-fssp-ru/mvv/smev3/container/1.1.0" xmlns:uuid="java.util.UUID">
 	<xsl:output method="xml" encoding="UTF-8"/>
-	<xsl:param name="ClientID"/>
-	<xsl:param name="ToClientID"/>
+	<xsl:param name="Timestamp"/>
 	<xsl:template match="/">
 		<tns:ClientMessage xmlns:tns="urn://x-artefacts-smev-gov-ru/services/service-adapter/types">
 			<tns:itSystem>FSOR01_3T</tns:itSystem>
 			<tns:ResponseMessage>
 				<tns:ResponseMetadata>
 					<tns:clientId>
-						<xsl:value-of select="$ClientID"/>
+						<xsl:variable name="uuid" select="uuid:randomUUID()"/>
+						<xsl:value-of select="$uuid"/>
 					</tns:clientId>
 					<tns:replyToClientId>
-						<xsl:value-of select="$ToClientID"/>
+						<xsl:value-of select="/tns:QueryResult/tns:Message/tns:RequestMetadata/tns:clientId"/>
 					</tns:replyToClientId>
 				</tns:ResponseMetadata>
 				<tns:ResponseContent>
@@ -27,16 +27,33 @@
 	</xsl:template>
 	<xsl:template match="//fssp:ApplicationDocumentsRequest">
 		<fssp:ApplicationDocumentsResponse xmlns:fssp="urn://x-artifacts-fssp-ru/mvv/smev3/application-documents/1.1.1" xmlns:c="urn://x-artifacts-fssp-ru/mvv/smev3/container/1.1.0">
-			<c:ID>038e7a1f-6c51-4843-8155-acf3e169afb1</c:ID>
-			<c:ReferencedPackId>12f1a3cd-cd5f-48fe-8eb4-f73e3d9f8a8g</c:ReferencedPackId>
-			<c:Date>2015-10-16T12:00:00</c:Date>
+			<c:ID>
+				<xsl:variable name="uuid" select="uuid:randomUUID()"/>
+				<xsl:value-of select="$uuid"/>
+			</c:ID>
+			<c:ReferencedPackId>
+				<xsl:value-of select="./c:ID"/>
+			</c:ReferencedPackId>
+			<c:Date>
+				<xsl:value-of select="$Timestamp"/>
+			</c:Date>
 			<c:ReceiptResult>SUCCESS</c:ReceiptResult>
-			<c:DocumentReceipt>
-				<c:ID>28251007270018</c:ID>
-				<c:ReferencedDocumentId>1256</c:ReferencedDocumentId>
-				<c:ReceiptDate>2015-10-16T12:00:00</c:ReceiptDate>
-				<c:ReceiptId>93</c:ReceiptId>
-			</c:DocumentReceipt>
+			<xsl:apply-templates select="//c:Document"/>
 		</fssp:ApplicationDocumentsResponse>
+	</xsl:template>
+	<xsl:template match="//c:Document">
+		<c:DocumentReceipt>
+			<c:ID>
+				<xsl:variable name="uuid" select="uuid:randomUUID()"/>
+				<xsl:value-of select="$uuid"/>
+			</c:ID>
+			<c:ReferencedDocumentId>
+				<xsl:value-of select="./c:ID"/>
+			</c:ReferencedDocumentId>
+			<c:ReceiptDate>
+				<xsl:value-of select="$Timestamp"/>
+			</c:ReceiptDate>
+			<c:ReceiptId>93</c:ReceiptId>
+		</c:DocumentReceipt>
 	</xsl:template>
 </xsl:stylesheet>
