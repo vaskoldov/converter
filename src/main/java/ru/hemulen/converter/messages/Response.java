@@ -4,16 +4,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import ru.hemulen.converter.exceptions.AttachmentException;
 import ru.hemulen.converter.exceptions.ParsingException;
 import ru.hemulen.converter.exceptions.ResponseException;
-import ru.hemulen.converter.thread.RequestProcessor;
 import ru.hemulen.converter.thread.ResponseProcessor;
 import ru.hemulen.converter.thread.Response13Processor;
 
 import javax.xml.transform.TransformerException;
+import javax.xml.xpath.*;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -28,7 +29,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 public class Response {
-    private static Logger LOG = LoggerFactory.getLogger(Response.class.getName());
+    private final static Logger LOG = LoggerFactory.getLogger(Response.class.getName());
     private File responseFile;
     private Document responseDOM;
     private File resultFile;
@@ -43,21 +44,42 @@ public class Response {
     private String errCode;         // Код ошибки
     private String errDescription;  // Описание ошибки
     private Boolean isESIAResponse; // Признак, что ответ пришел во второй instance адаптера
+    private Boolean isFSSPRequest;  // Признак, что ответ является входящим запросом ФССП
+    private Boolean isFSSPResponse; // Признак, что ответ является ответом ФССП (там по-другому обрабатываются статусы)
 
     public Response(File responseFile) throws ResponseException, ParsingException {
         // Определяем, в каком каталоге находится обрабатываемый запрос
-        this.isESIAResponse = responseFile.getPath().startsWith(Response13Processor.inputDir.toString());
+        isESIAResponse = responseFile.getPath().startsWith(Response13Processor.inputDir.toString());
         this.responseFile = responseFile;
-        this.errCode = "";
-        this.errDescription = "";
+        errCode = "";
+        errDescription = "";
         try {
-            responseDOM = XMLTransformer.fileToDocument(responseFile);
-            Element root = responseDOM.getDocumentElement();
+            this.responseDOM = XMLTransformer.fileToDocument(responseFile);
+            Element root = this.responseDOM.getDocumentElement();
+            // Проверяем, что ответ является входящим запросом ФССП
+            NodeList fsspRequest = root.getElementsByTagNameNS("urn://x-artifacts-fssp-ru/mvv/smev3/application-documents/1.1.1", "ApplicationDocumentsRequest");
+            if (fsspRequest.getLength() != 0) {
+                isFSSPRequest = true;
+            } else {
+                isFSSPRequest = false;
+            }
+            // Проверяем, что ответ является ответом ФССП
+            NodeList fsspResponse = root.getElementsByTagNameNS("urn://x-artifacts-fssp-ru/mvv/smev3/application-documents/1.1.1", "ApplicationDocumentsResponse");
+            if (fsspResponse.getLength() != 0) {
+                isFSSPResponse = true;
+            } else {
+                isFSSPResponse = false;
+            }
             // Считываем clientID ответа
             NodeList clientIDNodes = root.getElementsByTagName("clientId");
             if (clientIDNodes.getLength() != 0) {
                 clientID = clientIDNodes.item(0).getTextContent();
             }
+            if (isFSSPRequest) {
+                    responseType = "FSSPRequest";
+                    // Запросы ФССП обрабатываются по отдельному алгоритму, поэтому здесь не заполняем остальные члены класса
+                    return;
+                }
             // Считываем messageID ответа (начиная с версии 3.1.8 каталоги с вложениями именуются по MessageId ответа)
             NodeList messageIDNodes = root.getElementsByTagName("MessageId");
             if (messageIDNodes.getLength() != 0) {
@@ -74,6 +96,9 @@ public class Response {
                     if (sender.getLength() != 0) {
                         responseType = "BusinessStatus";
                     }
+                }
+                if (responseType.equals("PrimaryMessage") && isFSSPResponse) {
+                    responseType = "FSSPBusinessStatus";
                 }
             } else {
                 // Если нельзя определить тип ответа, то нельзя и обработать его - выбрасываем исключение
@@ -439,4 +464,93 @@ public class Response {
         }
     }
 
+    public void processFSSPRequest() {
+        Element root = responseDOM.getDocumentElement();
+        NodeList documentNodes = root.getElementsByTagNameNS("urn://x-artifacts-fssp-ru/mvv/smev3/container/1.1.0", "Document");
+        for (int i = 0; i < documentNodes.getLength(); i++) {
+            processDocument(documentNodes.item(i));
+        }
+        //TODO Отправить ответ на запрос
+    }
+
+    private void processDocument(Node documentNode) {
+        XPath xPath = XPathFactory.newInstance().newXPath();
+        XPathExpression exp;
+        String query;
+        String docKey;
+        String attachmentFile;
+        try {
+            query = "*[local-name()='IncomingDocKey']";
+            exp = xPath.compile(query);
+            docKey = (String) exp.evaluate(documentNode, XPathConstants.STRING);
+            query = "*[local-name()='AttachmentsBlock']/*[local-name()='AttachmentDescription']/*[local-name()='AttachmentFilename']";
+            exp = xPath.compile(query);
+            attachmentFile = (String) exp.evaluate(documentNode, XPathConstants.STRING);
+        } catch (XPathExpressionException e) {
+            LOG.error(String.format("Не удалось преобразовать в ответ запрос ФССП %s", messageID));
+            LOG.error(e.getMessage());
+            return;
+        }
+        Path attachmentFilePath = Paths.get(ResponseProcessor.attachmentDir.toString(), clientID, attachmentFile);
+        String requestFileName = ResponseProcessor.dbConnection.getFSSPRequestFileName(docKey);
+        if (requestFileName == null) {
+            requestFileName = clientID + ".xml";
+        }
+        String responseFileName = ResponseProcessor.outputDir.resolve(requestFileName.replace(".xml", ".zip")).toString();
+        try {
+            // Оставляем в запросе ФССП элемент, относящийся к указанному документу
+            String response = XMLTransformer.splitFSSPRequest(responseDOM, docKey);
+            // Пакуем xml-ответ и файл вложения в файл с именем responseFileName
+            ZipOutputStream zout = new ZipOutputStream(new FileOutputStream(responseFileName));
+            ZipEntry xmlEntry = new ZipEntry(requestFileName);
+            zout.putNextEntry(xmlEntry);
+            zout.write(response.getBytes(StandardCharsets.UTF_8));
+            zout.closeEntry();
+            ZipEntry attachmentEntry = new ZipEntry(attachmentFilePath.getFileName().toString());
+            zout.putNextEntry(attachmentEntry);
+            FileInputStream fis = new FileInputStream(attachmentFilePath.toString());
+            byte[] buffer = new byte[fis.available()];
+            fis.read(buffer);
+            zout.write(buffer);
+            zout.closeEntry();
+            fis.close();
+            zout.close();
+            // Меняем статус исходного запроса в таблице log
+            Long logID = ResponseProcessor.dbConnection.getFSSPRequestLogId(docKey);
+            if (logID != null) {
+                ResponseProcessor.dbConnection.logStatus(logID, "ANSWERED");
+            } else {
+                LOG.error(String.format("Не удалось получить идентификатор лога для исходного запроса ФССП с идентификатором документа %ы", docKey));
+            }
+        } catch (TransformerException | IOException e) {
+            LOG.error(String.format("Не удалось преобразовать в ответ запрос ФССП %s", clientID));
+            LOG.error(e.getMessage());
+        } catch (SQLException e) {
+            LOG.error("Не удалось изменить статус запроса ФССП");
+            LOG.error(e.getMessage());
+        }
+    }
+
+    /**
+     * PrimaryMessage из ответа ФССП обрабатывается как бизнес-статус запроса
+     * В качестве значения errCode подставляется значение элемента ReceiptResult
+     * В качестве значения errDescription подставляется значение элемента MessageText
+     */
+    public void processFSSPResponse() throws ResponseException {
+        XPath xPath = XPathFactory.newInstance().newXPath();
+        XPathExpression exp;
+        String query;
+        try {
+            query = "*[local-name()='ReceiptResult']";
+            exp = xPath.compile(query);
+            errCode = (String) exp.evaluate(responseDOM.getDocumentElement(), XPathConstants.STRING);
+            query = "*[local-name()='MessageText']";
+            exp = xPath.compile(query);
+            errDescription = (String) exp.evaluate(responseDOM.getDocumentElement(), XPathConstants.STRING);
+            logBusinessStatus();
+        } catch (XPathExpressionException | SQLException e) {
+            throw new ResponseException(String.format("Не удалось обработать ответ %s.", responseFile.getName()), new Exception());
+        }
+
+    }
 }

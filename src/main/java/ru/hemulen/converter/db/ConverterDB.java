@@ -101,10 +101,10 @@ public class ConverterDB implements AutoCloseable {
     }
 
     /**
-     * Метод получает на вход список ClientID ответов, которые созданы в базе H2 с определенного момента.
+     * Метод получает на вход список ClientID ответов, которые созданы в базе адаптера с определенного момента.
      * Для каждой записи из resultSet метод обновляет response_id и response_timestamp записи соответствующего запроса в таблице log.
      * Метод возвращает максимальное значение response_timestamp из resultSet.
-     * @param resultSet Список запросов, созданных в базе H2, начиная с определенного момента времени.
+     * @param resultSet Список запросов, созданных в базе адаптера, начиная с определенного момента времени.
      * @return Максимальное значение send_timestamp из resultSet.
      */
     public Timestamp updateResponses(ResultSet resultSet) {
@@ -170,9 +170,15 @@ public class ConverterDB implements AutoCloseable {
         statement.close();
     }
 
-    public void logRequest(String file_name, String client_id, String vs_name, Date timeout, Integer msg_index, String keywords) throws SQLException {
-        String sql = String.format("INSERT INTO \"%s\".log (log_id, file_name, receipt_timestamp, client_id, status, timeout, msg_index, vs_name, keywords) " +
-                "VALUES (DEFAULT, '%s', DEFAULT, '%s', 'PREPARED', '%s', %d, '%s', '%s')", schema, file_name, client_id, timeout, msg_index, vs_name, keywords);
+    public void logRequest(String file_name,
+                           String client_id,
+                           String vs_name,
+                           Date timeout,
+                           Integer msg_index,
+                           String keywords,
+                           String documentKey) throws SQLException {
+        String sql = String.format("INSERT INTO \"%s\".log (log_id, file_name, receipt_timestamp, client_id, status, timeout, msg_index, vs_name, keywords, document_key) " +
+                "VALUES (DEFAULT, '%s', DEFAULT, '%s', 'PREPARED', '%s', %d, '%s', '%s', '%s')", schema, file_name, client_id, timeout, msg_index, vs_name, keywords, documentKey);
         Statement statement = connection.createStatement();
         statement.executeUpdate(sql);
         statement.close();
@@ -268,5 +274,33 @@ public class ConverterDB implements AutoCloseable {
         sql = String.format("REFRESH MATERIALIZED VIEW \"%s\".full_log;", schema);
         statement.executeUpdate(sql);
         statement.close();
+    }
+
+    public String getFSSPRequestFileName(String docKey) {
+        String sql = String.format("SELECT file_name FROM \"%s\".log WHERE document_key = '%s';", schema, docKey);
+        try {
+            Statement statement = connection.createStatement();
+            ResultSet rs = statement.executeQuery(sql);
+            rs.next();
+            return rs.getString("file_name");
+        } catch (SQLException e) {
+            LOG.error(String.format("Не удалось найти входящий запрос ФССП для идентификатора документа %s", docKey));
+            LOG.error(e.getMessage());
+            return null;
+        }
+    }
+
+    public Long getFSSPRequestLogId(String docKey) {
+        String sql = String.format("SELECT log_id FROM \"%s\".log WHERE document_key = '%s';", schema, docKey);
+        try {
+            Statement statement = connection.createStatement();
+            ResultSet rs = statement.executeQuery(sql);
+            rs.next();
+            return rs.getLong("log_id");
+        } catch (SQLException e) {
+            LOG.error(String.format("Не удалось найти входящий запрос ФССП для идентификатора документа %s", docKey));
+            LOG.error(e.getMessage());
+            return null;
+        }
     }
 }

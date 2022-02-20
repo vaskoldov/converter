@@ -1,6 +1,7 @@
 //import ru.hemulen.h2pgsql.signer.Signer;
 import ru.hemulen.converter.thread.*;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;

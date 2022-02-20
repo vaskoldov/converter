@@ -7,7 +7,7 @@
 	<xsl:param name="AttachmentSign"/>
 	<xsl:template match="/">
 		<tns:ClientMessage xmlns:tns="urn://x-artefacts-smev-gov-ru/services/service-adapter/types">
-			<tns:itSystem>FSOR01_3T</tns:itSystem>
+			<tns:itSystem>FSOR01_3S</tns:itSystem>
 			<tns:RequestMessage>
 				<tns:RequestMetadata>
 					<tns:clientId>

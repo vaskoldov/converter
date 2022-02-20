@@ -42,6 +42,7 @@ public class Request {
     private String personalSign = "";       // Имя файла с подписью должностного лица
     private String attachmentFile = "";     // Имя файла вложения
     private String attachmentSign = "";     // Имя файла с подписью файла вложения
+    private String documentKey;             // Идентификатор документа в запросе ФССП
 
     /**
      * Конструктор запроса
@@ -138,7 +139,7 @@ public class Request {
     public void log() {
         try {
             Date timeoutSQL = new Date(timeoutDate.getTimeInMillis());
-            RequestProcessor.dbConnection.logRequest(requestFile.getName(), clientID, getVSName(), timeoutSQL, requestIndex, keywords);
+            RequestProcessor.dbConnection.logRequest(requestFile.getName(), clientID, getVSName(), timeoutSQL, requestIndex, keywords, documentKey);
         } catch (SQLException e) {
             LOG.error(e.getMessage());
         }
@@ -315,7 +316,6 @@ public class Request {
             // Оставляем запрос в каталоге requests до следующего прохода RequestProcessor'а (возможно не закончилось копирование файла)
             return;
         }
-
         File statement = targetPath.toFile(); // Файл вложения лежит уже в новом каталоге
         File statementSign;
         try {
@@ -359,7 +359,7 @@ public class Request {
         // При этом исходный файл с заявлением перезаписывается файлом с основным запросом
         File mainRequestFile;
         try {
-            mainRequestFile = XMLTransformer.createFSSPClientMessage(this.requestFile, attachmentFile.toFile(), this.clientID);
+            mainRequestFile = XMLTransformer.createFSSPRequest(this.requestFile, attachmentFile.toFile(), this.clientID);
             // Перезаписываем исходный файл с заявлением файлом с основным запросом
             Files.move(mainRequestFile.toPath(), this.requestFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
         } catch (ParserConfigurationException | SAXException | IOException | TransformerException | XPathExpressionException e) {
@@ -369,12 +369,17 @@ public class Request {
 
         // Присваиваем имена сформированных файлов членам класса Request, кроме requestFile,
         // который был заменен сгенерированным файлом
-        this.requestDOM = AbstractTools.fileToElement(this.requestFile).getOwnerDocument();
+        requestDOM = AbstractTools.fileToElement(this.requestFile).getOwnerDocument();
         this.attachmentFile = attachmentFile.toString();
         this.attachmentSign = attachmentSign.toString();
-
-
+        try {
+            documentKey = XMLTransformer.getFSSPDocumentKey(this.requestDOM.getDocumentElement());
+        } catch (XPathExpressionException e) {
+            LOG.error(String.format("Не удалось получить ExternalId из запроса ФССП %s", this.requestFile.getName()));
+            LOG.error(e.getMessage());
+        }
     }
+
     public File getRequestFile() {
         return requestFile;
     }

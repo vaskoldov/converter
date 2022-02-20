@@ -30,7 +30,7 @@ public class ResponseProcessor extends Thread {
     public static ConverterDB dbConnection;  // Отдельное подключение к БД PostgreSQL для обработчика ответов
     private Boolean isRunnable;
     private long sleepTime;         // Время задержки перед следующим опросом каталога, если он оказывается пуст
-    private Path inputDir;          // Каталог, в который адаптер помещает ответы СМЭВ (IN)
+    public static Path inputDir;          // Каталог, в который адаптер помещает ответы СМЭВ (IN)
     private Path inputDir13;        // Каталог, в который второй instance адаптера помещает ответы СМЭВ (IN)
     public static Path attachmentDir;      // Каталог, в который адаптер помещает файлы вложений
     public static Path attachmentDir13;    // Каталог, в который второй instance адаптера помещает файлы вложений
@@ -149,6 +149,12 @@ public class ResponseProcessor extends Thread {
                                 response.processRejectMessage();
                                 // Логируем статус REJECTED и описание причин отказа в базе данных
                                 response.logReject();
+                                break;
+                            case "FSSPRequest":
+                                response.processFSSPRequest();
+                                break;
+                            case "FSSPBusinessStatus":
+                                response.processFSSPResponse();
                                 break;
                             default:
                                 // Не удалось определить статус ответа

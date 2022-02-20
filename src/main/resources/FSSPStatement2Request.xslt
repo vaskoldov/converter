@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:fssp="http://www.fssprus.ru/namespace/IRequestOther/2020/1" xmlns:fssp3="http://www.fssprus.ru/namespace/IRequestOther/2021/1" xmlns:c="urn://x-artifacts-fssp-ru/mvv/smev3/container/1.1.0" xmlns:ns2="urn://x-artifacts-fssp-ru/mvv/smev3/application-documents/1.1.1" xmlns:att="urn://x-artifacts-fssp-ru/mvv/smev3/attachments/1.1.0" xmlns:fssp2="http://www.fssprus.ru/namespace/incoming/2019/1">
+<xsl:stylesheet version="1.0"  xmlns:ns2="urn://x-artifacts-fssp-ru/mvv/smev3/application-documents/1.1.1" xmlns:c="urn://x-artifacts-fssp-ru/mvv/smev3/container/1.1.0"  xmlns:att="urn://x-artifacts-fssp-ru/mvv/smev3/attachments/1.1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:fssp="http://www.fssprus.ru/namespace/IRequestOther/2020/1" xmlns:fssp3="http://www.fssprus.ru/namespace/IRequestOther/2021/1" xmlns:fssp2="http://www.fssprus.ru/namespace/incoming/2019/1">
 	<xsl:output method="xml" version="1.0" encoding="UTF-8" indent="yes"/>
 	<xsl:param name="fileName"/>
 	<xsl:param name="clientID"/>

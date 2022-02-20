@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import ru.hemulen.converter.thread.RequestProcessor;
@@ -18,8 +19,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.xpath.*;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
@@ -35,7 +35,8 @@ public class XMLTransformer {
     private static final String ToEGRNTechDescStylesheet = "./src/main/resources/EGRNStatement2TechDesc.xslt";
     private static final String ToEGRNMainRequestStylesheet = "./src/main/resources/EGRNStatement2Request.xslt";
     private static final String ToESIAClientMessage = "./src/main/resources/ESIA.xslt";
-    private static final String ToFSSPClientMessage = "./src/main/resources/FSSPStatement2Request.xslt";
+    private static final String ToFSSPRequest = "./src/main/resources/FSSPStatement2Request.xslt";
+    private static final String SplitFSSPRequest = "./src/main/resources/SplitFSSPRequest.xslt";
     private static Logger LOG = LoggerFactory.getLogger(XMLTransformer.class.getName());
     private static DocumentBuilderFactory factory;
     private static DocumentBuilder builder;
@@ -45,7 +46,8 @@ public class XMLTransformer {
     private static Transformer transformerEGRNToTechDesc;
     private static Transformer transformerEGRNToMainRequest;
     private static Transformer transformerESIAToClientMessage;
-    private static Transformer transformerFSSPToClientMessage;
+    private static Transformer transformerFSSPToRequest;
+    private static Transformer transformerFSSPRequestToResponse;
     private static XPathFactory xpathFactory;
     private static XPath xpath;
 
@@ -83,9 +85,14 @@ public class XMLTransformer {
             transformerESIAToClientMessage = transformerFactory.newTransformer(toESIAClientMessageStyleSource);
 
             // Создаем трансформер для преобразования вложения ФССП в ClientMessage
-            File toFSSPClientMessageStylesheet = new File(ToFSSPClientMessage);
+            File toFSSPClientMessageStylesheet = new File(ToFSSPRequest);
             StreamSource toFSSPClientMessageStyleSource = new StreamSource(toFSSPClientMessageStylesheet);
-            transformerFSSPToClientMessage = transformerFactory.newTransformer(toFSSPClientMessageStyleSource);
+            transformerFSSPToRequest = transformerFactory.newTransformer(toFSSPClientMessageStyleSource);
+
+            // Создаем трансформер для преобразования запроса ФССП в ответ ИС УВ
+            File splitFSSPRequestStylesheet = new File(SplitFSSPRequest);
+            StreamSource splitFSSPRequestStyleSource = new StreamSource(splitFSSPRequestStylesheet);
+            transformerFSSPRequestToResponse = transformerFactory.newTransformer(splitFSSPRequestStyleSource);
 
             // Создаем обработчик XPath запросов
             xpathFactory = XPathFactory.newInstance();
@@ -209,17 +216,17 @@ public class XMLTransformer {
         return targetFile;
     }
 
-    public synchronized static File createFSSPClientMessage(File fsspStatement, File attachmentFile, String clientID) throws ParserConfigurationException, SAXException, IOException, TransformerException, XPathExpressionException {
+    public synchronized static File createFSSPRequest(File fsspStatement, File attachmentFile, String clientID) throws ParserConfigurationException, SAXException, IOException, TransformerException, XPathExpressionException {
         String targetFileName = fsspStatement.getName() + ".cm";
         File targetFile = RequestProcessor.inputDir.resolve(targetFileName).toFile();
         StreamResult target = new StreamResult(targetFile);
         Element fsspDOM = AbstractTools.fileToElement(fsspStatement);
         DOMSource source = new DOMSource(fsspDOM.getOwnerDocument());
         String requestDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(Calendar.getInstance().getTime());;
-        transformerFSSPToClientMessage.setParameter("fileName", attachmentFile.getName());
-        transformerFSSPToClientMessage.setParameter("requestDate", requestDate);
-        transformerFSSPToClientMessage.setParameter("clientID", clientID);
-        transformerFSSPToClientMessage.transform(source, target);
+        transformerFSSPToRequest.setParameter("fileName", attachmentFile.getName());
+        transformerFSSPToRequest.setParameter("requestDate", requestDate);
+        transformerFSSPToRequest.setParameter("clientID", clientID);
+        transformerFSSPToRequest.transform(source, target);
         return targetFile;
     }
 
@@ -294,5 +301,34 @@ public class XMLTransformer {
         }
 
         return regionCode;
+    }
+
+    public static String getFSSPDocumentKey(Element request) throws XPathExpressionException {
+        String documentIdQuery = "//*[local-name()='Document']/*[local-name()='ID']";
+        XPathExpression exp = xpath.compile(documentIdQuery);
+        NodeList documentIdNodes = (NodeList) exp.evaluate(request, XPathConstants.NODESET);
+        if (documentIdNodes.getLength() !=0) {
+            return documentIdNodes.item(0).getTextContent();
+        }
+        return "";
+    }
+
+    public static String getElementValue(Node root, String tagName){
+        String query = String.format("//*[local-name()='%s']/text()", tagName);
+        try {
+            XPathExpression exp = xpath.compile(query);
+            String result = (String) exp.evaluate(root, XPathConstants.STRING);
+            return result;
+        } catch (XPathExpressionException e) {
+            return null;
+        }
+    }
+
+    public static String splitFSSPRequest(Document requestDOM, String docKey) throws TransformerException {
+        StreamResult target = new StreamResult(new StringWriter());
+        DOMSource source = new DOMSource(requestDOM);
+        transformerFSSPRequestToResponse.setParameter("DocKey", docKey);
+        transformerFSSPRequestToResponse.transform(source, target);
+        return target.getWriter().toString();
     }
 }
