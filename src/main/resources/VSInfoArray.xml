@@ -363,12 +363,27 @@
 		<keywords>/*[local-name()="passportDossierRequest"]/*[local-name()="passport"]/*[local-name()="number"]/text()</keywords>
 	</vsInfoEntry>
 	<vsInfoEntry>
-		<namespace>urn://fake/1.1.0</namespace>
-		<name>Заглушка для исправления отправки запросов с max приоритетом</name>
+		<namespace>urn://x-artefacts-gibdd-reqbyOwner/data/1.4</namespace>
+		<name>Выписка о транспортном средстве по владельцу</name>
 		<timeout>30</timeout>
-		<dailyLimit>0</dailyLimit>
+		<dailyLimit>70000</dailyLimit>
 		<priority>300</priority>
+		<keywords>/*[local-name()="RequestByOwner"]/*[local-name()="RequestForIndividual_IP"]/*[local-name()="LastName"]/text()</keywords>
+		<keywords>/*[local-name()="RequestByOwner"]/*[local-name()="RequestForIndividual_IP"]/*[local-name()="FirstName"]/text()</keywords>
+		<keywords>/*[local-name()="RequestByOwner"]/*[local-name()="RequestForIndividual_IP"]/*[local-name()="MiddleName"]/text()</keywords>
 	</vsInfoEntry>
+	<vsInfoEntry>
+		<namespace>urn://x-artefacts-gibdd-reqbyVIN/data/1.4</namespace>
+		<name>Выписка о транспортном средстве по VIN</name>
+		<timeout>30</timeout>
+		<dailyLimit>70000</dailyLimit>
+		<priority>300</priority>
+		<keywords>/*[local-name()="RequestByVIN"]/*[local-name()="VIN_ChassisNumber_CarcaseNumber"]/*[local-name()="VIN_or_ChassisNumber_or_CarcaseNumber"]/text()</keywords>
+		<keywords>/*[local-name()="RequestByVIN"]/*[local-name()="VIN_ChassisNumber_CarcaseNumber"]/*[local-name()="ns1:VIN_and_ChassisNumber_and_CarcaseNumber"]/*[local-name()="ns1:VIN"]/text()</keywords>
+		<keywords>/*[local-name()="RequestByVIN"]/*[local-name()="VIN_ChassisNumber_CarcaseNumber"]/*[local-name()="ns1:VIN_and_ChassisNumber_and_CarcaseNumber"]/*[local-name()="ns1:ChassisNumber"]/text()</keywords>
+		<keywords>/*[local-name()="RequestByVIN"]/*[local-name()="VIN_ChassisNumber_CarcaseNumber"]/*[local-name()="ns1:VIN_and_ChassisNumber_and_CarcaseNumber"]/*[local-name()="ns1:CarcaseNumber"]/text()</keywords>
+	</vsInfoEntry>
+
 	<!-- 
 ================= Неиспользуемые виды сведений =================
 	<vsInfoEntry>
