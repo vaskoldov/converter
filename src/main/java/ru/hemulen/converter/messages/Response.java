@@ -490,10 +490,10 @@ public class Response {
         String docKey;
         String attachmentFile;
         try {
-            query = "*[local-name()='IncomingDocKey']";
+            query = "//*[local-name()='IncomingDocKey']";
             exp = xPath.compile(query);
             docKey = (String) exp.evaluate(documentNode, XPathConstants.STRING);
-            query = "*[local-name()='AttachmentsBlock']/*[local-name()='AttachmentDescription']/*[local-name()='AttachmentFilename']";
+            query = "//*[local-name()='AttachmentsBlock']/*[local-name()='AttachmentDescription']/*[local-name()='AttachmentFilename']";
             exp = xPath.compile(query);
             attachmentFile = (String) exp.evaluate(documentNode, XPathConstants.STRING);
         } catch (XPathExpressionException e) {
@@ -551,10 +551,10 @@ public class Response {
         XPathExpression exp;
         String query;
         try {
-            query = "*[local-name()='ReceiptResult']";
+            query = "//*[local-name()='ReceiptResult']";
             exp = xPath.compile(query);
             errCode = (String) exp.evaluate(responseDOM.getDocumentElement(), XPathConstants.STRING);
-            query = "*[local-name()='MessageText']";
+            query = "//*[local-name()='MessageText']";
             exp = xPath.compile(query);
             errDescription = (String) exp.evaluate(responseDOM.getDocumentElement(), XPathConstants.STRING);
             logBusinessStatus();
