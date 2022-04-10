@@ -490,10 +490,10 @@ public class Response {
         String docKey;
         String attachmentFile;
         try {
-            query = "//*[local-name()='IncomingDocKey']";
+            query = "./*[local-name()='IncomingDocKey']";
             exp = xPath.compile(query);
             docKey = (String) exp.evaluate(documentNode, XPathConstants.STRING);
-            query = "//*[local-name()='AttachmentsBlock']/*[local-name()='AttachmentDescription']/*[local-name()='AttachmentFilename']";
+            query = "./*[local-name()='AttachmentsBlock']/*[local-name()='AttachmentDescription']/*[local-name()='AttachmentFilename']";
             exp = xPath.compile(query);
             attachmentFile = (String) exp.evaluate(documentNode, XPathConstants.STRING);
         } catch (XPathExpressionException e) {
