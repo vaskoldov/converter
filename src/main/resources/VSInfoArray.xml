@@ -135,6 +135,16 @@
 		<keywords>/*[local-name()="NDFL3DOHRequest"]/*[local-name()="ФИОФЛ"]/@Patronymic</keywords>
 	</vsInfoEntry>
 	<vsInfoEntry>
+		<namespace>urn://x-artefacts-fns-ndfl3doh/root/210-18/4.0.2</namespace>
+		<name>3-НДФЛ (4.0.2)</name>
+		<timeout>30</timeout>
+		<dailyLimit>35000</dailyLimit>
+		<priority>40</priority>
+		<keywords>/*[local-name()="NDFL3DOHRequest"]/*[local-name()="ФИОФЛ"]/@FamilyName</keywords>
+		<keywords>/*[local-name()="NDFL3DOHRequest"]/*[local-name()="ФИОФЛ"]/@FirstName</keywords>
+		<keywords>/*[local-name()="NDFL3DOHRequest"]/*[local-name()="ФИОФЛ"]/@Patronymic</keywords>
+	</vsInfoEntry>
+	<vsInfoEntry>
 		<namespace>urn://x-artefacts-fns-bankaccinfl/root/171-07/4.0.1</namespace>
 		<name>Счета ФЛ в инобанках</name>
 		<timeout>30</timeout>
