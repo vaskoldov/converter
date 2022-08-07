@@ -4,7 +4,7 @@
 		<namespace>urn://x-artefacts-fns-zvipip-tosmv-ru/311-15/4.0.6</namespace>
 		<name>ЕГРИП</name>
 		<timeout>30</timeout>
-		<dailyLimit>70000</dailyLimit>
+		<dailyLimit>100000</dailyLimit>
 		<priority>200</priority>
 		<keywords>/*[local-name()="FNSZvipIPRequest"]/*[local-name()="ЗапросИП"]/*[local-name()="ИНН"]/text()</keywords>
 		<keywords>/*[local-name()="FNSZvipIPRequest"]/*[local-name()="ЗапросИП"]/*[local-name()="ОГРНИП"]/text()</keywords>
@@ -23,7 +23,7 @@
 		<name>ЕГРЮЛ</name>
 		<timeout>30</timeout>
 		<priority>210</priority>
-		<dailyLimit>70000</dailyLimit>
+		<dailyLimit>100000</dailyLimit>
 		<keywords>/*[local-name()="FNSZvipULRequest"]/*[local-name()="ЗапросЮЛ"]/*[local-name()="ОГРН"]/text()</keywords>
 		<keywords>/*[local-name()="FNSZvipULRequest"]/*[local-name()="ЗапросЮЛ"]/*[local-name()="ИННЮЛ"]/text()</keywords>
 	</vsInfoEntry>
@@ -40,7 +40,7 @@
 		<namespace>urn://x-artefacts-fns-ndfl3/root/210-10/4.0.5</namespace>
 		<name>НД по форме 3-НДФЛ</name>
 		<timeout>30</timeout>
-		<dailyLimit>35000</dailyLimit>
+		<dailyLimit>70000</dailyLimit>
 		<priority>240</priority>
 		<keywords>/*[local-name()="NDFL3Request"]/*[local-name()="ФИОФЛ"]/@FamilyName</keywords>
 		<keywords>/*[local-name()="NDFL3Request"]/*[local-name()="ФИОФЛ"]/@FirstName</keywords>
@@ -51,7 +51,7 @@
 		<namespace>urn://x-artefacts-fns-bankaccinul/root/171-06/4.0.1</namespace>
 		<name>Счета организаций в инобанках</name>
 		<timeout>30</timeout>
-		<dailyLimit>35000</dailyLimit>
+		<dailyLimit>70000</dailyLimit>
 		<priority>110</priority>
 		<keywords>/*[local-name()="BankAccInULRequest"]/*[local-name()="СвОрг"]/@ИННЮЛ</keywords>
 		<keywords>/*[local-name()="BankAccInULRequest"]/*[local-name()="СвОрг"]/@КПП</keywords>
@@ -61,7 +61,7 @@
 		<namespace>urn://x-artefacts-fns-bankaccpers/root/171-05/4.0.0</namespace>
 		<name>Счета ФЛ</name>
 		<timeout>30</timeout>
-		<dailyLimit>35000</dailyLimit>
+		<dailyLimit>70000</dailyLimit>
 		<priority>70</priority>
 		<keywords>/*[local-name()="BankAccPersRequest"]/*[local-name()="ФИО"]/@FamilyName</keywords>
 		<keywords>/*[local-name()="BankAccPersRequest"]/*[local-name()="ФИО"]/@FirstName</keywords>
@@ -71,7 +71,7 @@
 		<namespace>urn://x-artefacts-fns-bankaccentrep/root/171-04/4.0.1</namespace>
 		<name>Счета ИП</name>
 		<timeout>30</timeout>
-		<dailyLimit>35000</dailyLimit>
+		<dailyLimit>70000</dailyLimit>
 		<priority>90</priority>
 		<keywords>/*[local-name()="BankAccEntrepRequest"]/*[local-name()="ФИОИП"]/@FamilyName</keywords>
 		<keywords>/*[local-name()="BankAccEntrepRequest"]/*[local-name()="ФИОИП"]/@FirstName</keywords>
@@ -81,7 +81,7 @@
 		<namespace>urn://x-artefacts-fns-ndipsr/root/210-17/4.0.0</namespace>
 		<name>НД ИП спецрежим</name>
 		<timeout>30</timeout>
-		<dailyLimit>35000</dailyLimit>
+		<dailyLimit>70000</dailyLimit>
 		<priority>60</priority>
 		<keywords>/*[local-name()="NDIPSRRequest"]/*[local-name()="СведИП"]/*[local-name()="ФИО"]/@FamilyName</keywords>
 		<keywords>/*[local-name()="NDIPSRRequest"]/*[local-name()="СведИП"]/*[local-name()="ФИО"]/@FirstName</keywords>
@@ -91,7 +91,7 @@
 		<namespace>urn://x-artefacts-fns-inn-singular/root/270-18/4.0.1</namespace>
 		<name>ИНН ФЛ</name>
 		<timeout>30</timeout>
-		<dailyLimit>35000</dailyLimit>
+		<dailyLimit>70000</dailyLimit>
 		<priority>10</priority>
 		<keywords>/*[local-name()="FNSINNSingularRequest"]/*[local-name()="СведФЛ"]/*[local-name()="ФИО"]/@Фамилия</keywords>
 		<keywords>/*[local-name()="FNSINNSingularRequest"]/*[local-name()="СведФЛ"]/*[local-name()="ФИО"]/@Имя</keywords>
@@ -101,7 +101,7 @@
 		<namespace>urn://x-artefacts-fns-ndfl2/root/260-10/4.1.1</namespace>
 		<name>2-НДФЛ</name>
 		<timeout>30</timeout>
-		<dailyLimit>35000</dailyLimit>
+		<dailyLimit>70000</dailyLimit>
 		<priority>30</priority>
 		<keywords>/*[local-name()="NDFL2Request"]/*[local-name()="СвНА"]/*[local-name()="СвНАЮЛ"]/@НаимОрг</keywords>
 		<keywords>/*[local-name()="NDFL2Request"]/*[local-name()="СвНА"]/*[local-name()="СвНАФЛ"]/*[local-name()="ФИО"]/@FamilyName</keywords>
@@ -115,7 +115,7 @@
 		<namespace>urn://x-artefacts-fns-uchflul-ru/310_62/4.0.2</namespace>
 		<name>Участие ФЛ в ЮЛ</name>
 		<timeout>30</timeout>
-		<dailyLimit>35000</dailyLimit>
+		<dailyLimit>70000</dailyLimit>
 		<priority>100</priority>
 		<keywords>/*[local-name()="UchFLULRequest"]/*[local-name()="ИдСвФЛ"]/*[local-name()="ИНН_ФИО"]/*[local-name()="ФИО"]/@FamilyName</keywords>
 		<keywords>/*[local-name()="UchFLULRequest"]/*[local-name()="ИдСвФЛ"]/*[local-name()="ИНН_ФИО"]/*[local-name()="ФИО"]/@FirstName</keywords>
@@ -128,7 +128,7 @@
 		<namespace>urn://x-artefacts-fns-ndfl3doh/root/210-18/4.0.0</namespace>
 		<name>3-НДФЛ</name>
 		<timeout>30</timeout>
-		<dailyLimit>35000</dailyLimit>
+		<dailyLimit>70000</dailyLimit>
 		<priority>40</priority>
 		<keywords>/*[local-name()="NDFL3DOHRequest"]/*[local-name()="ФИОФЛ"]/@FamilyName</keywords>
 		<keywords>/*[local-name()="NDFL3DOHRequest"]/*[local-name()="ФИОФЛ"]/@FirstName</keywords>
@@ -138,17 +138,27 @@
 		<namespace>urn://x-artefacts-fns-ndfl3doh/root/210-18/4.0.2</namespace>
 		<name>3-НДФЛ (4.0.2)</name>
 		<timeout>30</timeout>
-		<dailyLimit>35000</dailyLimit>
+		<dailyLimit>70000</dailyLimit>
 		<priority>40</priority>
 		<keywords>/*[local-name()="NDFL3DOHRequest"]/*[local-name()="ФИОФЛ"]/@FamilyName</keywords>
 		<keywords>/*[local-name()="NDFL3DOHRequest"]/*[local-name()="ФИОФЛ"]/@FirstName</keywords>
 		<keywords>/*[local-name()="NDFL3DOHRequest"]/*[local-name()="ФИОФЛ"]/@Patronymic</keywords>
 	</vsInfoEntry>
 	<vsInfoEntry>
+		<namespace>urn://x-artefacts-fns-ndfl3doh/root/210-18/4.0.3</namespace>
+		<name>3-НДФЛ (4.0.3)</name>
+		<timeout>30</timeout>
+		<dailyLimit>70000</dailyLimit>
+		<priority>40</priority>
+		<keywords>/*[local-name()="NDFL3DOHRequest"]/*[local-name()="ФИОФЛ"]/@Фамилия</keywords>
+		<keywords>/*[local-name()="NDFL3DOHRequest"]/*[local-name()="ФИОФЛ"]/@Имя</keywords>
+		<keywords>/*[local-name()="NDFL3DOHRequest"]/*[local-name()="ФИОФЛ"]/@Отчество</keywords>
+	</vsInfoEntry>
+	<vsInfoEntry>
 		<namespace>urn://x-artefacts-fns-bankaccinfl/root/171-07/4.0.1</namespace>
 		<name>Счета ФЛ в инобанках</name>
 		<timeout>30</timeout>
-		<dailyLimit>35000</dailyLimit>
+		<dailyLimit>70000</dailyLimit>
 		<priority>80</priority>
 		<keywords>/*[local-name()="BankAccInFLRequest"]/*[local-name()="ФИО"]/@Фамилия</keywords>
 		<keywords>/*[local-name()="BankAccInFLRequest"]/*[local-name()="ФИО"]/@Имя</keywords>
@@ -158,7 +168,7 @@
 		<namespace>http://rosreestr.ru/services/v0.18/TStatementRequestEGRN</namespace>
 		<name>ЕГРН</name>
 		<timeout>30</timeout>
-		<dailyLimit>35000</dailyLimit>
+		<dailyLimit>70000</dailyLimit>
 		<priority>140</priority>
 		<keywords>/*[local-name()="EGRNRequest"]/*[local-name()="requestDetails"]/*[local-name()="requestEGRNDataAction"]/*[local-name()="extractDataAction"]/*[local-name()="object"]/*[local-name()="cadastralNumber"]/*[local-name()="cadastralNumber"]/text()</keywords>
 	</vsInfoEntry>
@@ -166,7 +176,7 @@
 		<namespace>urn://x-artefacts-fns-dohflna/root/260-18/4.0.1</namespace>
 		<name>Доходы ФЛ НА</name>
 		<timeout>30</timeout>
-		<dailyLimit>35000</dailyLimit>
+		<dailyLimit>70000</dailyLimit>
 		<priority>50</priority>
 		<keywords>/*[local-name()="DOHFLNARequest"]/*[local-name()="СвФЛ"]/*[local-name()="ФИОФЛ"]/@FamilyName</keywords>
 		<keywords>/*[local-name()="DOHFLNARequest"]/*[local-name()="СвФЛ"]/*[local-name()="ФИОФЛ"]/@FirstName</keywords>
@@ -176,7 +186,7 @@
 		<namespace>urn://services-gibdd-ru/carservice/root/1.0.0</namespace>
 		<name>ТС</name>
 		<timeout>30</timeout>
-		<dailyLimit>35000</dailyLimit>
+		<dailyLimit>70000</dailyLimit>
 		<priority>150</priority>
 		<keywords>/*[local-name()="carRegistrationsRequest"]/*[local-name()="personCriteria"]/*[local-name()="lastName"]/text()</keywords>
 		<keywords>/*[local-name()="carRegistrationsRequest"]/*[local-name()="personCriteria"]/*[local-name()="firstName"]/text()</keywords>
@@ -187,7 +197,7 @@
 		<namespace>urn://gossluzhba.gov.ru/eisuks/services/export-declaration/1.1.1</namespace>
 		<name>Гражданская служба</name>
 		<timeout>30</timeout>
-		<dailyLimit>35000</dailyLimit>
+		<dailyLimit>70000</dailyLimit>
 		<priority>130</priority>
 		<keywords>/*[local-name()="ExportDeclarationRequest"]/*[local-name()="Criteria"]/*[local-name()="FamilyName"]/text()</keywords>
 		<keywords>/*[local-name()="ExportDeclarationRequest"]/*[local-name()="Criteria"]/*[local-name()="FirstName"]/text()</keywords>
@@ -197,8 +207,8 @@
 		<namespace>http://kvs.pfr.com/snils-by-additionalData/1.0.1</namespace>
 		<name>СНИЛС</name>
 		<timeout>30</timeout>
-		<dailyLimit>35000</dailyLimit>
-		<priority>20</priority>
+		<dailyLimit>70000</dailyLimit>
+		<priority>10</priority>
 		<keywords>/*[local-name()="SnilsByAdditionalDataRequest"]/*[local-name()="FamilyName"]/text()</keywords>
 		<keywords>/*[local-name()="SnilsByAdditionalDataRequest"]/*[local-name()="FirstName"]/text()</keywords>
 		<keywords>/*[local-name()="SnilsByAdditionalDataRequest"]/*[local-name()="Patronymic"]/text()</keywords>
@@ -207,7 +217,7 @@
 		<namespace>urn://ru/mvd/ibd-m/convictions/search/1.0.2</namespace>
 		<name>Судимость</name>
 		<timeout>30</timeout>
-		<dailyLimit>35000</dailyLimit>
+		<dailyLimit>70000</dailyLimit>
 		<priority>120</priority>
 		<keywords>/*[local-name()="request"]/*[local-name()="surname"]/text()</keywords>
 		<keywords>/*[local-name()="request"]/*[local-name()="name"]/text()</keywords>
@@ -225,7 +235,15 @@
 		<namespace>urn://roskazna.ru/gisgmp/xsd/services/export-payments/2.3.0</namespace>
 		<name>Предоставление информации об уплате</name>
 		<timeout>30</timeout>
-		<dailyLimit>35000</dailyLimit>
+		<dailyLimit>70000</dailyLimit>
+		<priority>160</priority>
+		<keywords>/*[local-name()="ExportPaymentsRequest"]/*[local-name()="PaymentsExportConditions"]/*[local-name()="PayersConditions"]/*[local-name()="PayerIdentifier"]/text()</keywords>
+	</vsInfoEntry>
+	<vsInfoEntry>
+		<namespace>urn://roskazna.ru/gisgmp/xsd/services/export-payments/2.4.0</namespace>
+		<name>Предоставление информации об уплате (2.4.0)</name>
+		<timeout>30</timeout>
+		<dailyLimit>70000</dailyLimit>
 		<priority>160</priority>
 		<keywords>/*[local-name()="ExportPaymentsRequest"]/*[local-name()="PaymentsExportConditions"]/*[local-name()="PayersConditions"]/*[local-name()="PayerIdentifier"]/text()</keywords>
 	</vsInfoEntry>
@@ -233,7 +251,16 @@
 		<namespace>urn://roskazna.ru/gisgmp/xsd/services/export-charges/2.3.0</namespace>
 		<name>Предоставление необходимой для уплаты информации</name>
 		<timeout>30</timeout>
-		<dailyLimit>35000</dailyLimit>
+		<dailyLimit>70000</dailyLimit>
+		<priority>170</priority>
+		<keywords>/*[local-name()="ExportChargesRequest"]/*[local-name()="ChargesExportConditions"]/*[local-name()="PayersConditions"]/*[local-name()="PayerIdentifier"]/text()</keywords>
+		<keywords>/*[local-name()="ExportChargesRequest"]/*[local-name()="ChargesExportConditions"]/*[local-name()="PayersConditions"]/*[local-name()="PayerInn"]/text()</keywords>
+	</vsInfoEntry>
+		<vsInfoEntry>
+		<namespace>urn://roskazna.ru/gisgmp/xsd/services/export-charges/2.4.0</namespace>
+		<name>Предоставление необходимой для уплаты информации (2.4.0)</name>
+		<timeout>30</timeout>
+		<dailyLimit>70000</dailyLimit>
 		<priority>170</priority>
 		<keywords>/*[local-name()="ExportChargesRequest"]/*[local-name()="ChargesExportConditions"]/*[local-name()="PayersConditions"]/*[local-name()="PayerIdentifier"]/text()</keywords>
 		<keywords>/*[local-name()="ExportChargesRequest"]/*[local-name()="ChargesExportConditions"]/*[local-name()="PayersConditions"]/*[local-name()="PayerInn"]/text()</keywords>
@@ -252,14 +279,14 @@
 		<namespace>urn://x-artefacts-smev-gov-ru/services/service-adapter/types</namespace>
 		<name>Персональные данные пользователя ЕСИА</name>
 		<timeout>30</timeout>
-		<dailyLimit>20000</dailyLimit>
+		<dailyLimit>70000</dailyLimit>
 		<priority>290</priority>
 	</vsInfoEntry>
 	<vsInfoEntry>
 		<namespace>urn://x-artefacts-fns-zaksvegrul/root/312-83/4.0.0</namespace>
 		<name>ЕГРЮЛ (новый)</name>
 		<timeout>30</timeout>
-		<dailyLimit>70000</dailyLimit>
+		<dailyLimit>100000</dailyLimit>
 		<priority>210</priority>
 		<keywords>/*[local-name()="ZAKRSVEGRULRequest"]/*[local-name()="ЗапросЮЛ"]/*[local-name()="ИННЮЛ"]/text()</keywords>
 		<keywords>/*[local-name()="ZAKRSVEGRULRequest"]/*[local-name()="ЗапросЮЛ"]/*[local-name()="ОГРН"]/text()</keywords>
@@ -268,7 +295,7 @@
 		<namespace>urn://x-artefacts-fns-zaksvegrip/root/312-90/4.0.0</namespace>
 		<name>ЕГРИП (новый)</name>
 		<timeout>30</timeout>
-		<dailyLimit>70000</dailyLimit>
+		<dailyLimit>100000</dailyLimit>
 		<priority>200</priority>
 		<keywords>/*[local-name()="ZAKSVEGRIPRequest"]/*[local-name()="ЗапросИП"]/*[local-name()="ИННФЛ"]/text()</keywords>
 		<keywords>/*[local-name()="ZAKSVEGRIPRequest"]/*[local-name()="ЗапросИП"]/*[local-name()="ОГРНИП"]/text()</keywords>
@@ -278,7 +305,7 @@
 		<name>Паспорта гражданина РФ</name>
 		<timeout>30</timeout>
 		<dailyLimit>70000</dailyLimit>
-		<priority>250</priority>
+		<priority>10</priority>
 		<keywords>/*[local-name()="passportDossierRequest"]/*[local-name()="person"]/*[local-name()="lastName"]/text()</keywords>
 		<keywords>/*[local-name()="passportDossierRequest"]/*[local-name()="person"]/*[local-name()="firstName"]/text()</keywords>
 		<keywords>/*[local-name()="passportDossierRequest"]/*[local-name()="person"]/*[local-name()="middleName"]/text()</keywords>
@@ -364,7 +391,7 @@
 		<name>Паспорта гражданина РФ</name>
 		<timeout>30</timeout>
 		<dailyLimit>70000</dailyLimit>
-		<priority>250</priority>
+		<priority>30</priority>
 		<keywords>/*[local-name()="passportDossierRequest"]/*[local-name()="person"]/*[local-name()="lastName"]/text()</keywords>
 		<keywords>/*[local-name()="passportDossierRequest"]/*[local-name()="person"]/*[local-name()="firstName"]/text()</keywords>
 		<keywords>/*[local-name()="passportDossierRequest"]/*[local-name()="person"]/*[local-name()="middleName"]/text()</keywords>
@@ -392,6 +419,16 @@
 		<keywords>/*[local-name()="RequestByVIN"]/*[local-name()="VIN_ChassisNumber_CarcaseNumber"]/*[local-name()="ns1:VIN_and_ChassisNumber_and_CarcaseNumber"]/*[local-name()="ns1:VIN"]/text()</keywords>
 		<keywords>/*[local-name()="RequestByVIN"]/*[local-name()="VIN_ChassisNumber_CarcaseNumber"]/*[local-name()="ns1:VIN_and_ChassisNumber_and_CarcaseNumber"]/*[local-name()="ns1:ChassisNumber"]/text()</keywords>
 		<keywords>/*[local-name()="RequestByVIN"]/*[local-name()="VIN_ChassisNumber_CarcaseNumber"]/*[local-name()="ns1:VIN_and_ChassisNumber_and_CarcaseNumber"]/*[local-name()="ns1:CarcaseNumber"]/text()</keywords>
+	</vsInfoEntry>
+		<vsInfoEntry>
+		<namespace>http://fss.ru/smev-3/wozm/infpay/1.0.1</namespace>
+		<name>Прямые выплаты</name>
+		<timeout>30</timeout>
+		<dailyLimit>70000</dailyLimit>
+		<priority>310</priority>tns:paymentsRequest/tns:firstName
+		<keywords>/*[local-name()="paymentsRequest"]/*[local-name()="firstName"]/text()</keywords>
+		<keywords>/*[local-name()="paymentsRequest"]/*[local-name()="secondName"]/text()</keywords>
+		<keywords>/*[local-name()="paymentsRequest"]/*[local-name()="patronymic"]/text()</keywords>
 	</vsInfoEntry>
 
 	<!-- 

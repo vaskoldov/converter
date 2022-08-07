@@ -241,7 +241,13 @@ public class Response {
                     fis.close();
                     // Добавляем файлы вложений
                     for (File entryFile : attachmentFiles) {
-                        entry = new ZipEntry(entryFile.getName());
+                        String entryName = entryFile.getName();
+                        // От некоторых поставщиков приходят архивы без расширения zip
+                        if (!entryName.contains(".")) {
+                            // Если в имени файла нет расширения, то добавляем расширение .zip
+                            entryName += ".zip";
+                        }
+                        entry = new ZipEntry(entryName);
                         zip.putNextEntry(entry);
                         fis = new FileInputStream(entryFile);
                         buffer = new byte[fis.available()];
