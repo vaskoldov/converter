@@ -20,6 +20,8 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.xpath.*;
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
@@ -347,6 +349,14 @@ public class XMLTransformer {
         Element fsspDOM = AbstractTools.fileToElement(request);
         DOMSource source = new DOMSource(fsspDOM.getOwnerDocument());
         transformerAnswerFSSPRequest.transform(source, target);
+        // Читаем файл в строку
+        String content = new String(Files.readAllBytes(targetFile.toPath()));
+        // Удаляем namespace xmlns:uuid="java.util.UUID", из-за которого адаптер не подписывает ответ
+        content = content.replace("xmlns:uuid=\"java.util.UUID\"", "");
+        // Записываем строку обратно в файл
+        FileWriter fw = new FileWriter(targetFile);
+        fw.write(content);
+        fw.close();
         return targetFile;
     }
 }
