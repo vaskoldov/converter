@@ -290,6 +290,11 @@ public class RequestProcessor extends Thread {
                                 request.generateESIARequest();
                                 request.log();
                                 break;
+                            case "ЕРН":
+                                // Запрос ЕРН должен отправляться в адаптер по версии схем СМЭВ 1.3
+                                request.processTo13();
+                                request.log();
+                                break;
                             case "ФССП":
                                 if (isEGRNSignRegistered) {
                                     try {

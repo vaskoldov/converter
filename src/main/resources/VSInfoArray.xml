@@ -99,7 +99,7 @@
 	</vsInfoEntry>
 	<vsInfoEntry>
 		<namespace>urn://x-artefacts-fns-ndfl2/root/260-10/4.1.1</namespace>
-		<name>2-НДФЛ</name>
+		<name>2-НДФЛ</name> <!-- Не изменять!!! Название используется в коде конвертера-->
 		<timeout>30</timeout>
 		<dailyLimit>70000</dailyLimit>
 		<priority>30</priority>
@@ -166,7 +166,7 @@
 	</vsInfoEntry>
 	<vsInfoEntry>
 		<namespace>http://rosreestr.ru/services/v0.18/TStatementRequestEGRN</namespace>
-		<name>ЕГРН</name>
+		<name>ЕГРН</name> <!-- Не изменять!!! Название используется в коде конвертера-->
 		<timeout>30</timeout>
 		<dailyLimit>70000</dailyLimit>
 		<priority>140</priority>
@@ -174,7 +174,7 @@
 	</vsInfoEntry>
 	<vsInfoEntry>
 		<namespace>urn://x-artefacts-fns-dohflna/root/260-18/4.0.1</namespace>
-		<name>Доходы ФЛ НА</name>
+		<name>Доходы ФЛ НА</name> <!-- Не изменять!!! Название используется в коде конвертера-->
 		<timeout>30</timeout>
 		<dailyLimit>70000</dailyLimit>
 		<priority>50</priority>
@@ -215,7 +215,7 @@
 	</vsInfoEntry>
 	<vsInfoEntry>
 		<namespace>urn://ru/mvd/ibd-m/convictions/search/1.0.2</namespace>
-		<name>Судимость</name>
+		<name>Судимость</name> <!-- Не изменять!!! Название используется в коде конвертера-->
 		<timeout>30</timeout>
 		<dailyLimit>70000</dailyLimit>
 		<priority>120</priority>
@@ -256,7 +256,7 @@
 		<keywords>/*[local-name()="ExportChargesRequest"]/*[local-name()="ChargesExportConditions"]/*[local-name()="PayersConditions"]/*[local-name()="PayerIdentifier"]/text()</keywords>
 		<keywords>/*[local-name()="ExportChargesRequest"]/*[local-name()="ChargesExportConditions"]/*[local-name()="PayersConditions"]/*[local-name()="PayerInn"]/text()</keywords>
 	</vsInfoEntry>
-		<vsInfoEntry>
+	<vsInfoEntry>
 		<namespace>urn://roskazna.ru/gisgmp/xsd/services/export-charges/2.4.0</namespace>
 		<name>Предоставление необходимой для уплаты информации (2.4.0)</name>
 		<timeout>30</timeout>
@@ -277,7 +277,7 @@
 	</vsInfoEntry>
 	<vsInfoEntry>
 		<namespace>urn://x-artefacts-smev-gov-ru/services/service-adapter/types</namespace>
-		<name>Персональные данные пользователя ЕСИА</name>
+		<name>Персональные данные пользователя ЕСИА</name> <!-- Не изменять!!! Название используется в коде конвертера-->
 		<timeout>30</timeout>
 		<dailyLimit>70000</dailyLimit>
 		<priority>290</priority>
@@ -359,7 +359,7 @@
 	</vsInfoEntry>
 	<vsInfoEntry>
 		<namespace>http://www.fssprus.ru/namespace/incoming/2019/1</namespace>
-		<name>ФССП</name>
+		<name>ФССП</name> <!-- Не изменять!!! Название используется в коде конвертера-->
 		<timeout>30</timeout>
 		<dailyLimit>70000</dailyLimit>
 		<priority>290</priority>
@@ -368,7 +368,7 @@
 	</vsInfoEntry>
 	<vsInfoEntry>
 		<namespace>http://www.fssprus.ru/namespace/IRequestOther/2020/1</namespace>
-		<name>ФССП</name>
+		<name>ФССП</name> <!-- Не изменять!!! Название используется в коде конвертера-->
 		<timeout>30</timeout>
 		<dailyLimit>70000</dailyLimit>
 		<priority>290</priority>
@@ -378,7 +378,7 @@
 	</vsInfoEntry>
 	<vsInfoEntry>
 		<namespace>http://www.fssprus.ru/namespace/IRequestOther/2021/1</namespace>
-		<name>ФССП</name>
+		<name>ФССП</name> <!-- Не изменять!!! Название используется в коде конвертера-->
 		<timeout>30</timeout>
 		<dailyLimit>70000</dailyLimit>
 		<priority>290</priority>
@@ -420,7 +420,7 @@
 		<keywords>/*[local-name()="RequestByVIN"]/*[local-name()="VIN_ChassisNumber_CarcaseNumber"]/*[local-name()="ns1:VIN_and_ChassisNumber_and_CarcaseNumber"]/*[local-name()="ns1:ChassisNumber"]/text()</keywords>
 		<keywords>/*[local-name()="RequestByVIN"]/*[local-name()="VIN_ChassisNumber_CarcaseNumber"]/*[local-name()="ns1:VIN_and_ChassisNumber_and_CarcaseNumber"]/*[local-name()="ns1:CarcaseNumber"]/text()</keywords>
 	</vsInfoEntry>
-		<vsInfoEntry>
+	<vsInfoEntry>
 		<namespace>http://fss.ru/smev-3/wozm/infpay/1.0.1</namespace>
 		<name>Прямые выплаты</name>
 		<timeout>30</timeout>
@@ -430,7 +430,36 @@
 		<keywords>/*[local-name()="paymentsRequest"]/*[local-name()="secondName"]/text()</keywords>
 		<keywords>/*[local-name()="paymentsRequest"]/*[local-name()="patronymic"]/text()</keywords>
 	</vsInfoEntry>
-
+	<vsInfoEntry>
+		<namespace>http://fss.ru/smev-3/wozm/infpay/1.0.0</namespace>
+		<name>Прямые выплаты (1.0.0)</name>
+		<timeout>30</timeout>
+		<dailyLimit>70000</dailyLimit>
+		<priority>310</priority>tns:paymentsRequest/tns:firstName
+		<keywords>/*[local-name()="paymentsRequest"]/*[local-name()="snils"]/text()</keywords>
+	</vsInfoEntry>
+	<vsInfoEntry>
+		<namespace>urn://mvd/gismu/esfl/passport-full-by-person-doc-root/1.0.0</namespace>
+		<name>Паспортное досье</name>
+		<timeout>30</timeout>
+		<dailyLimit>70000</dailyLimit>
+		<priority>30</priority>tns:paymentsRequest/tns:firstName
+		<keywords>/*[local-name()="PassportFullByPersonDocRequest"]/*[local-name()="PersonDataRequest"]/*[local-name()="FIO"]/*[local-name()="FamilyName"]/text()</keywords>
+		<keywords>/*[local-name()="PassportFullByPersonDocRequest"]/*[local-name()="PersonDataRequest"]/*[local-name()="FIO"]/*[local-name()="FirstName"]/text()</keywords>
+		<keywords>/*[local-name()="PassportFullByPersonDocRequest"]/*[local-name()="PersonDataRequest"]/*[local-name()="FIO"]/*[local-name()="Patronymic"]/text()</keywords>
+		<keywords>/*[local-name()="PassportFullByPersonDocRequest"]/*[local-name()="Document"]/*[local-name()="Series"]/text()</keywords>
+		<keywords>/*[local-name()="PassportFullByPersonDocRequest"]/*[local-name()="Document"]/*[local-name()="Number"]/text()</keywords>
+	</vsInfoEntry>
+	<vsInfoEntry>
+		<namespace>urn://x-artefacts-fns-flinfo/root/1.0.2</namespace>
+		<name>ЕРН</name> <!-- Не изменять!!! Название используется в коде конвертера-->
+		<timeout>30</timeout>
+		<dailyLimit>70000</dailyLimit>
+		<priority>30</priority>tns:paymentsRequest/tns:firstName
+		<keywords>/*[local-name()="FLInfoRequest"]/*[local-name()="Документ"]/*[local-name()="СведФЛ"]/*[local-name()="ФИО"]/*[local-name()="Фамилия"]/text()</keywords>
+		<keywords>/*[local-name()="FLInfoRequest"]/*[local-name()="Документ"]/*[local-name()="СведФЛ"]/*[local-name()="ФИО"]/*[local-name()="Имя"]/text()</keywords>
+		<keywords>/*[local-name()="FLInfoRequest"]/*[local-name()="Документ"]/*[local-name()="СведФЛ"]/*[local-name()="ФИО"]/*[local-name()="Отчество"]/text()</keywords>
+	</vsInfoEntry>
 	<!-- 
 ================= Неиспользуемые виды сведений =================
 	<vsInfoEntry>

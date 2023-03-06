@@ -99,12 +99,14 @@ public class Request {
     }
 
     public String getVSName() {
-        if (vsInfo == null) {return "Unknown";}
+        if (vsInfo == null) {
+            return "Unknown";
+        }
         return vsInfo.name;
     }
 
     /**
-     * Метод преобразует запрос в формат ClientMessage
+     * Метод преобразует запрос в формат ClientMessage его в каталог с соответствующим приоритетом
      */
     public void process() throws RequestException {
         // Определяем каталог для сохранения результирующего файла в соответствии с приоритетом вида сведений
@@ -136,6 +138,29 @@ public class Request {
         }
     }
 
+    /**
+     * Метод преобразует запрос в ClientMessage и помещает его в каталог исходящих сообщений адаптера по версии схем СМЭВ 1.3
+     * Механизм приоритетных очередей при этом не используется
+     */
+    public void processTo13() throws RequestException {
+        Path outputDir = RequestProcessor.outputDir13;
+        resultFile = outputDir.resolve(requestFile.toPath().getFileName()).toFile();
+        // Выполняем преобразование
+        try {
+            // Читаем подпись вложения в строку
+            String attachmentSignString = "";
+            if (!attachmentSign.isEmpty()) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(attachmentSign)));
+                attachmentSignString = reader.readLine();
+                reader.close();
+            }
+            XMLTransformer.createClientMessage(requestDOM, resultFile, clientID, personalSign, attachmentFile, attachmentSignString);
+        } catch (TransformerException | IOException e) {
+            LOG.error(e.getMessage());
+            throw new RequestException("Не удалось преобразовать в ClientMessage запрос " + resultFile.getName(), new Exception());
+        }
+    }
+
     public void log() {
         try {
             Date timeoutSQL = new Date(timeoutDate.getTimeInMillis());
@@ -144,6 +169,7 @@ public class Request {
             LOG.error(e.getMessage());
         }
     }
+
     /**
      * Метод возвращает информацию вида сведений
      *
@@ -198,6 +224,7 @@ public class Request {
 
     /**
      * Метод на основании заявления (statement) в ЕГРН создает файлы с техническим описанием и запрос
+     *
      * @throws RequestException ошибка при обоработке запроса
      */
     public void generateEGRNRequest() throws RequestException, ParserConfigurationException, SAXException, IOException, SignException {
@@ -266,7 +293,8 @@ public class Request {
             mainRequestFile = XMLTransformer.createMainRequest(this.requestFile, this.clientID);
             // Перезаписываем исходный файл с заявлением файлом с основным запросом
             Files.move(mainRequestFile.toPath(), this.requestFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-        } catch (ParserConfigurationException | SAXException | IOException | TransformerException | XPathExpressionException e) {
+        } catch (ParserConfigurationException | SAXException | IOException | TransformerException |
+                 XPathExpressionException e) {
             LOG.error(e.getMessage());
             throw new RequestException(String.format("Не удалось сформировать запрос Request для заявления ЕГРН %s.", this.requestFile.getName()), e);
         }
@@ -362,7 +390,8 @@ public class Request {
             mainRequestFile = XMLTransformer.createFSSPRequest(this.requestFile, attachmentFile.toFile(), this.clientID);
             // Перезаписываем исходный файл с заявлением файлом с основным запросом
             Files.move(mainRequestFile.toPath(), this.requestFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-        } catch (ParserConfigurationException | SAXException | IOException | TransformerException | XPathExpressionException e) {
+        } catch (ParserConfigurationException | SAXException | IOException | TransformerException |
+                 XPathExpressionException e) {
             LOG.error(e.getMessage());
             throw new RequestException(String.format("Не удалось сформировать запрос Request для заявления ЕГРН %s.", this.requestFile.getName()), e);
         }

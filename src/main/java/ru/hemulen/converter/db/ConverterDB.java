@@ -281,8 +281,11 @@ public class ConverterDB implements AutoCloseable {
         try {
             Statement statement = connection.createStatement();
             ResultSet rs = statement.executeQuery(sql);
-            rs.next();
-            return rs.getString("file_name");
+            while (rs.next()) {
+                return rs.getString("file_name");
+            };
+            LOG.error(String.format("Не удалось найти входящий запрос ФССП для идентификатора документа %s", docKey));
+            return null;
         } catch (SQLException e) {
             LOG.error(String.format("Не удалось найти входящий запрос ФССП для идентификатора документа %s", docKey));
             LOG.error(e.getMessage());
