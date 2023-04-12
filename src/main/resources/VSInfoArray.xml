@@ -99,7 +99,23 @@
 	</vsInfoEntry>
 	<vsInfoEntry>
 		<namespace>urn://x-artefacts-fns-ndfl2/root/260-10/4.1.1</namespace>
-		<name>2-НДФЛ</name> <!-- Не изменять!!! Название используется в коде конвертера-->
+		<!-- Название ВС не изменять - используется в коде конвертера -->		
+		<name>2-НДФЛ</name>
+		<timeout>30</timeout>
+		<dailyLimit>70000</dailyLimit>
+		<priority>30</priority>
+		<keywords>/*[local-name()="NDFL2Request"]/*[local-name()="СвНА"]/*[local-name()="СвНАЮЛ"]/@НаимОрг</keywords>
+		<keywords>/*[local-name()="NDFL2Request"]/*[local-name()="СвНА"]/*[local-name()="СвНАФЛ"]/*[local-name()="ФИО"]/@FamilyName</keywords>
+		<keywords>/*[local-name()="NDFL2Request"]/*[local-name()="СвНА"]/*[local-name()="СвНАФЛ"]/*[local-name()="ФИО"]/@FirstName</keywords>
+		<keywords>/*[local-name()="NDFL2Request"]/*[local-name()="СвНА"]/*[local-name()="СвНАФЛ"]/*[local-name()="ФИО"]/Patronymic</keywords>
+		<keywords>/*[local-name()="NDFL2Request"]/*[local-name()="СвФЛ"]/*[local-name()="ФИОФЛ"]/@FamilyName</keywords>
+		<keywords>/*[local-name()="NDFL2Request"]/*[local-name()="СвФЛ"]/*[local-name()="ФИОФЛ"]/@FirstName</keywords>
+		<keywords>/*[local-name()="NDFL2Request"]/*[local-name()="СвФЛ"]/*[local-name()="ФИОФЛ"]/@Patronymic</keywords>
+	</vsInfoEntry>
+	<vsInfoEntry>
+		<namespace>urn://x-artefacts-fns-ndfl2/root/260-10/4.1.2</namespace>
+		<!-- Название ВС не изменять - используется в коде конвертера -->
+		<name>2-НДФЛ</name>
 		<timeout>30</timeout>
 		<dailyLimit>70000</dailyLimit>
 		<priority>30</priority>
@@ -155,6 +171,16 @@
 		<keywords>/*[local-name()="NDFL3DOHRequest"]/*[local-name()="ФИОФЛ"]/@Отчество</keywords>
 	</vsInfoEntry>
 	<vsInfoEntry>
+		<namespace>urn://x-artefacts-fns-ndfl3doh/root/210-18/4.0.4</namespace>
+		<name>3-НДФЛ (4.0.4)</name>
+		<timeout>30</timeout>
+		<dailyLimit>70000</dailyLimit>
+		<priority>40</priority>
+		<keywords>/*[local-name()="NDFL3DOHRequest"]/*[local-name()="ФИОФЛ"]/@Фамилия</keywords>
+		<keywords>/*[local-name()="NDFL3DOHRequest"]/*[local-name()="ФИОФЛ"]/@Имя</keywords>
+		<keywords>/*[local-name()="NDFL3DOHRequest"]/*[local-name()="ФИОФЛ"]/@Отчество</keywords>
+	</vsInfoEntry>
+	<vsInfoEntry>
 		<namespace>urn://x-artefacts-fns-bankaccinfl/root/171-07/4.0.1</namespace>
 		<name>Счета ФЛ в инобанках</name>
 		<timeout>30</timeout>
@@ -166,7 +192,8 @@
 	</vsInfoEntry>
 	<vsInfoEntry>
 		<namespace>http://rosreestr.ru/services/v0.18/TStatementRequestEGRN</namespace>
-		<name>ЕГРН</name> <!-- Не изменять!!! Название используется в коде конвертера-->
+		<!-- Название ВС не изменять - используется в коде конвертера -->
+		<name>ЕГРН</name>
 		<timeout>30</timeout>
 		<dailyLimit>70000</dailyLimit>
 		<priority>140</priority>
@@ -174,7 +201,8 @@
 	</vsInfoEntry>
 	<vsInfoEntry>
 		<namespace>urn://x-artefacts-fns-dohflna/root/260-18/4.0.1</namespace>
-		<name>Доходы ФЛ НА</name> <!-- Не изменять!!! Название используется в коде конвертера-->
+		<!-- Название ВС не изменять - используется в коде конвертера -->
+		<name>Доходы ФЛ НА</name>
 		<timeout>30</timeout>
 		<dailyLimit>70000</dailyLimit>
 		<priority>50</priority>
@@ -213,9 +241,20 @@
 		<keywords>/*[local-name()="SnilsByAdditionalDataRequest"]/*[local-name()="FirstName"]/text()</keywords>
 		<keywords>/*[local-name()="SnilsByAdditionalDataRequest"]/*[local-name()="Patronymic"]/text()</keywords>
 	</vsInfoEntry>
+		<vsInfoEntry>
+		<namespace>http://kvs.pfr.com/snils-by-additionalData/1.0.3</namespace>
+		<name>СНИЛС (1.0.3)</name>
+		<timeout>30</timeout>
+		<dailyLimit>70000</dailyLimit>
+		<priority>10</priority>
+		<keywords>/*[local-name()="SnilsByAdditionalDataRequest"]/*[local-name()="FamilyName"]/text()</keywords>
+		<keywords>/*[local-name()="SnilsByAdditionalDataRequest"]/*[local-name()="FirstName"]/text()</keywords>
+		<keywords>/*[local-name()="SnilsByAdditionalDataRequest"]/*[local-name()="Patronymic"]/text()</keywords>
+	</vsInfoEntry>
 	<vsInfoEntry>
 		<namespace>urn://ru/mvd/ibd-m/convictions/search/1.0.2</namespace>
-		<name>Судимость</name> <!-- Не изменять!!! Название используется в коде конвертера-->
+		<!-- Название ВС не изменять - используется в коде конвертера -->
+		<name>Судимость</name>
 		<timeout>30</timeout>
 		<dailyLimit>70000</dailyLimit>
 		<priority>120</priority>
@@ -248,6 +287,14 @@
 		<keywords>/*[local-name()="ExportPaymentsRequest"]/*[local-name()="PaymentsExportConditions"]/*[local-name()="PayersConditions"]/*[local-name()="PayerIdentifier"]/text()</keywords>
 	</vsInfoEntry>
 	<vsInfoEntry>
+		<namespace>urn://roskazna.ru/gisgmp/xsd/services/export-payments/2.5.0</namespace>
+		<name>Предоставление информации об уплате (2.5.0)</name>
+		<timeout>30</timeout>
+		<dailyLimit>70000</dailyLimit>
+		<priority>160</priority>
+		<keywords>/*[local-name()="ExportPaymentsRequest"]/*[local-name()="PaymentsExportConditions"]/*[local-name()="PayersConditions"]/*[local-name()="PayerIdentifier"]/text()</keywords>
+	</vsInfoEntry>
+	<vsInfoEntry>
 		<namespace>urn://roskazna.ru/gisgmp/xsd/services/export-charges/2.3.0</namespace>
 		<name>Предоставление необходимой для уплаты информации</name>
 		<timeout>30</timeout>
@@ -259,6 +306,15 @@
 	<vsInfoEntry>
 		<namespace>urn://roskazna.ru/gisgmp/xsd/services/export-charges/2.4.0</namespace>
 		<name>Предоставление необходимой для уплаты информации (2.4.0)</name>
+		<timeout>30</timeout>
+		<dailyLimit>70000</dailyLimit>
+		<priority>170</priority>
+		<keywords>/*[local-name()="ExportChargesRequest"]/*[local-name()="ChargesExportConditions"]/*[local-name()="PayersConditions"]/*[local-name()="PayerIdentifier"]/text()</keywords>
+		<keywords>/*[local-name()="ExportChargesRequest"]/*[local-name()="ChargesExportConditions"]/*[local-name()="PayersConditions"]/*[local-name()="PayerInn"]/text()</keywords>
+	</vsInfoEntry>
+		<vsInfoEntry>
+		<namespace>urn://roskazna.ru/gisgmp/xsd/services/export-charges/2.5.1</namespace>
+		<name>Предоставление необходимой для уплаты информации (2.5.1)</name>
 		<timeout>30</timeout>
 		<dailyLimit>70000</dailyLimit>
 		<priority>170</priority>
@@ -277,7 +333,8 @@
 	</vsInfoEntry>
 	<vsInfoEntry>
 		<namespace>urn://x-artefacts-smev-gov-ru/services/service-adapter/types</namespace>
-		<name>Персональные данные пользователя ЕСИА</name> <!-- Не изменять!!! Название используется в коде конвертера-->
+		<!-- Название ВС не изменять - используется в коде конвертера -->
+		<name>Персональные данные пользователя ЕСИА</name>
 		<timeout>30</timeout>
 		<dailyLimit>70000</dailyLimit>
 		<priority>290</priority>
@@ -359,7 +416,8 @@
 	</vsInfoEntry>
 	<vsInfoEntry>
 		<namespace>http://www.fssprus.ru/namespace/incoming/2019/1</namespace>
-		<name>ФССП</name> <!-- Не изменять!!! Название используется в коде конвертера-->
+		<!-- Название ВС не изменять - используется в коде конвертера -->
+		<name>ФССП</name>
 		<timeout>30</timeout>
 		<dailyLimit>70000</dailyLimit>
 		<priority>290</priority>
@@ -368,7 +426,7 @@
 	</vsInfoEntry>
 	<vsInfoEntry>
 		<namespace>http://www.fssprus.ru/namespace/IRequestOther/2020/1</namespace>
-		<name>ФССП</name> <!-- Не изменять!!! Название используется в коде конвертера-->
+		<name>ФССП</name>
 		<timeout>30</timeout>
 		<dailyLimit>70000</dailyLimit>
 		<priority>290</priority>
@@ -378,7 +436,7 @@
 	</vsInfoEntry>
 	<vsInfoEntry>
 		<namespace>http://www.fssprus.ru/namespace/IRequestOther/2021/1</namespace>
-		<name>ФССП</name> <!-- Не изменять!!! Название используется в коде конвертера-->
+		<name>ФССП</name>
 		<timeout>30</timeout>
 		<dailyLimit>70000</dailyLimit>
 		<priority>290</priority>
@@ -452,7 +510,8 @@
 	</vsInfoEntry>
 	<vsInfoEntry>
 		<namespace>urn://x-artefacts-fns-flinfo/root/1.0.2</namespace>
-		<name>ЕРН</name> <!-- Не изменять!!! Название используется в коде конвертера-->
+		<!-- Название ВС не изменять - используется в коде конвертера -->
+		<name>ЕРН</name>
 		<timeout>30</timeout>
 		<dailyLimit>70000</dailyLimit>
 		<priority>30</priority>tns:paymentsRequest/tns:firstName
