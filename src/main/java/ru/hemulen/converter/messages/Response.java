@@ -107,7 +107,6 @@ public class Response {
                 throw new ResponseException("Невозможно определить тип ответа " + responseFile.getName(), new Exception());
             }
             // В сообщениях PrimaryMessage и BusinessStatus ссылка на запрос называется replyToClientId
-            nodeList = root.getElementsByTagName("replyToClientId");
             if (nodeList.getLength() != 0) {
                 requestID = nodeList.item(0).getTextContent();
             } else {

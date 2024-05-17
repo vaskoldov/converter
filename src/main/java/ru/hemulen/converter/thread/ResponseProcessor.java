@@ -170,6 +170,7 @@ public class ResponseProcessor extends Thread {
                     } catch (ResponseException | SQLException e) {
                         LOG.error(e.getMessage());
                         LOG.info(String.format("Не удалось обработать ответ %s.", file.getName()));
+
                         // Перемещаем файл с ответом, вызвавший исключение, в каталог failed
                         Path target = failedDir.resolve(file.toPath().getFileName());
                         try {

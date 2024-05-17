@@ -16,7 +16,7 @@
 
     <groupId>ru.hemulen</groupId>
     <artifactId>converter</artifactId>
-    <version>5.4</version>
+    <version>5.5</version>
     <packaging>jar</packaging>
     <name>converter</name>
 
