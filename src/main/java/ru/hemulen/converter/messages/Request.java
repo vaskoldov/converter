@@ -19,6 +19,7 @@ import javax.xml.xpath.XPathExpressionException;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.sql.Date;
 import java.sql.SQLException;
@@ -29,9 +30,10 @@ import java.util.UUID;
  * Класс обрабатывает запросы ИС участника взаимодействия
  */
 public class Request {
-    private static Logger LOG = LoggerFactory.getLogger(Request.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(Request.class.getName());
     private File requestFile;               // Файл с запросом
     private Document requestDOM;            // Представление запроса в виде DOM-объекта
+    private String requestNamespace;        // URI namespace вида сведений (используется для различения версий ВС ЕГРН)
     private String clientID;                // Клиентский идентификатор запроса
     private File resultFile;                // Файл с преобразованным в ClientMessage запросом
     private Document clientMessage;         // Представление clientMessage в виде DOM-объекта
@@ -117,7 +119,7 @@ public class Request {
                 Files.createDirectory(resultDir);
             } catch (IOException e) {
                 LOG.error(e.getMessage());
-                throw new RequestException("Не удалось создать каталог " + resultDir.toString(), e);
+                throw new RequestException("Не удалось создать каталог " + resultDir, e);
             }
         }
         // Формируем имя результирующего файла
@@ -127,7 +129,7 @@ public class Request {
             // Читаем подпись вложения в строку
             String attachmentSignString = "";
             if (!attachmentSign.isEmpty()) {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(attachmentSign)));
+                BufferedReader reader = new BufferedReader(new InputStreamReader(Files.newInputStream(Paths.get(attachmentSign))));
                 attachmentSignString = reader.readLine();
                 reader.close();
             }
@@ -150,7 +152,7 @@ public class Request {
             // Читаем подпись вложения в строку
             String attachmentSignString = "";
             if (!attachmentSign.isEmpty()) {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(attachmentSign)));
+                BufferedReader reader = new BufferedReader(new InputStreamReader(Files.newInputStream(Paths.get(attachmentSign))));
                 attachmentSignString = reader.readLine();
                 reader.close();
             }
@@ -225,9 +227,11 @@ public class Request {
     /**
      * Метод на основании заявления (statement) в ЕГРН создает файлы с техническим описанием и запрос
      *
+     * @param vsName По этому параметру определяется версия ВС ЕГРН, а также версия технического описания, которые
+     *               должны быть созданы данным методом. Допустимые на 24.08.24 значения - "ЕГРН" и "ЕГРН_26" (см. VSInfoArray.xml)
      * @throws RequestException ошибка при обоработке запроса
      */
-    public void generateEGRNRequest() throws RequestException, ParserConfigurationException, SAXException, IOException, SignException {
+    public void generateEGRNRequest(String vsName) throws RequestException, ParserConfigurationException, SAXException, IOException, SignException {
         // Копируем файл в каталог для подписания.
         // Перемещать нельзя, т.к. в каталоге requests должен остаться исходный файл на случай исключений,
         // после которых он перемещается в каталог failed
@@ -242,7 +246,7 @@ public class Request {
         // На основании заявления создаем техническое описание
         File techDesc;
         try {
-            techDesc = XMLTransformer.createTechDesc(statement);
+            techDesc = XMLTransformer.createTechDesc(statement, vsName);
         } catch (ParserConfigurationException | SAXException | IOException | TransformerException e) {
             LOG.error(e.getMessage());
             throw new RequestException(String.format("Не удалось преобразовать заявление ЕГРН %s в техническое описание.", statement.getName()), e);
@@ -290,7 +294,7 @@ public class Request {
         // При этом исходный файл с заявлением перезаписывается файлом с основным запросом
         File mainRequestFile;
         try {
-            mainRequestFile = XMLTransformer.createMainRequest(this.requestFile, this.clientID);
+            mainRequestFile = XMLTransformer.createMainRequest(this.requestFile, this.clientID, vsName);
             // Перезаписываем исходный файл с заявлением файлом с основным запросом
             Files.move(mainRequestFile.toPath(), this.requestFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
         } catch (ParserConfigurationException | SAXException | IOException | TransformerException |
@@ -330,8 +334,6 @@ public class Request {
     /**
      * Метод на основании полученного из ИС УВ файла вложения генерирует запрос ClientMessage,
      * подписывает вложение подписью ЭП-СП, упаковывает вложение в архив, который также подписывается ЭП-СП
-     *
-     * @return
      */
     public void generateFSSPRequest() throws RequestException, ParserConfigurationException, SAXException, IOException, SignException {
         // Копируем файл вложения в каталог для подписания.

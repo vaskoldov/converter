@@ -32,6 +32,8 @@ import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Класс выполняет сканирование каталога, определенного в параметре EXCHANGE_PATH конфигурации.
@@ -41,7 +43,7 @@ import java.util.*;
  * Если превышен суточный лимит отправки запросов, то файл перемещается в подкаталог overlimit.
  */
 public class RequestProcessor extends Thread {
-    private static Logger LOG = LoggerFactory.getLogger(RequestProcessor.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(RequestProcessor.class.getName());
     private Properties props;
     private Boolean isRunnable;
     private long sleepTime;                 // Время задержки перед следующим опросом каталога, если он оказывается пуст
@@ -219,10 +221,9 @@ public class RequestProcessor extends Thread {
             // очистить базу данных H2 и перенести overlimited запросы в каталог requests
             checkNewDay();
             // Читаем файлы в рабочем каталоге
-            File[] files = inputDir.toFile().listFiles();
-            if (files.length <= 5) {
-                // Если каталог пуст (в рабочем каталоге есть еще подкаталоги processed, error, failed, overlimit и sign, поэтому такая проверка),
-                // то засыпаем на какое-то время и начинаем цикл while заново.
+            Set<Path> files = getFileList();
+            if (files.isEmpty()) {
+                // Если каталог пуст, то засыпаем на какое-то время и начинаем цикл while заново.
                 try {
                     LOG.info("Запросы отсутствуют.");
                     sleep(sleepTime);
@@ -231,16 +232,18 @@ public class RequestProcessor extends Thread {
                     LOG.error(e.getMessage());
                 }
             }
+            Iterator<Path> iterator = files.iterator();
             int filesNum = 0; // Счетчик успешно обработанных запросов
-            for (File file : files) {
-                if (!file.isDirectory() && isFileAccessible(file)) {
+            while (iterator.hasNext()) {
+                Path file = iterator.next();
+                if (isFileAccessible(file.toFile())) {
                     try {
                         // Создаем объект Request
-                        Request request = new Request(file);
+                        Request request = new Request(file.toFile());
                         String vsName = request.getVSName();
                         switch (vsName) {
                             case "Unknown":
-                                throw new RequestException("Неизвестный вид сведений " + file.getName(), new Exception());
+                                throw new RequestException("Неизвестный вид сведений " + file.getFileName(), new Exception());
                             case "2-НДФЛ":
                             case "Доходы ФЛ НА":
                                 if (isFNSSignRegistered) {
@@ -250,7 +253,7 @@ public class RequestProcessor extends Thread {
                                     clearSignDir();
                                     break;
                                 } else {
-                                    throw new SignException(String.format("Подпись ФНС не инициализирована. Файл %s не обработан.", file.getName()), new Exception());
+                                    throw new SignException(String.format("Подпись ФНС не инициализирована. Файл %s не обработан.", file.getFileName()), new Exception());
                                 }
                             case "Судимость":
                                 if (isEGRNSignRegistered) {
@@ -259,24 +262,25 @@ public class RequestProcessor extends Thread {
                                     request.log();
                                     clearSignDir();
                                 } else {
-                                    throw new SignException(String.format("Подпись ЕГРН не инициализирована. Файл %s не обработан.", file.getName()), new Exception());
+                                    throw new SignException(String.format("Подпись ЕГРН не инициализирована. Файл %s не обработан.", file.getFileName()), new Exception());
                                 }
                                 break;
                             case "ЕГРН":
+                            case "ЕГРН_26": // Новая версия EGRNRequest
                                 if (isEGRNSignRegistered) {
                                     try {
                                         // Создаем техническое описание и подписываем его вместе с заявлением,
                                         // архивируем все с подписями в файл вложения, подписываем файл вложения,
                                         // создаем файл запроса.
                                         // При этом request меняет значение члена requestFile на файл с запросом в ЕГРН
-                                        request.generateEGRNRequest();
+                                        request.generateEGRNRequest(vsName);
                                         // Первоначальный file в generateEGRNRequest заменяется на сгенерированный файл.
                                         // Поэтому его нужно восстановить.
-                                        file = request.getRequestFile();
+                                        file = request.getRequestFile().toPath();
                                     } catch (IOException e) {
-                                        throw new RequestException(String.format("Не удалось переместить заявление ЕГРН %s из каталога requests.", file.getName()), new Exception());
+                                        throw new RequestException(String.format("Не удалось переместить заявление ЕГРН %s из каталога requests.", file.getFileName()), new Exception());
                                     } catch (ParserConfigurationException | SAXException e) {
-                                        throw new RequestException(String.format("Не удалось обработать заявление ЕГРН %s.", file.getName()), new Exception());
+                                        throw new RequestException(String.format("Не удалось обработать заявление ЕГРН %s.", file.getFileName()), new Exception());
                                     }
                                     // Присваиваем текущему файлу вновь созданный файл запроса в ЕГРН
                                     request.process();
@@ -284,7 +288,7 @@ public class RequestProcessor extends Thread {
                                     clearSignDir();
                                     break;
                                 } else {
-                                    throw new SignException(String.format("Подпись ЕГРН не инициализирована. Файл %s не обработан.", file.getName()), new Exception());
+                                    throw new SignException(String.format("Подпись ЕГРН не инициализирована. Файл %s не обработан.", file.getFileName()), new Exception());
                                 }
                             case "Персональные данные пользователя ЕСИА":
                                 request.generateESIARequest();
@@ -299,12 +303,12 @@ public class RequestProcessor extends Thread {
                                 if (isEGRNSignRegistered) {
                                     try {
                                         request.generateFSSPRequest();
-                                        file = request.getRequestFile();
+                                        file = request.getRequestFile().toPath();
 
                                     } catch (IOException e) {
-                                        throw new RequestException(String.format("Не удалось переместить вложение ФССП %s из каталога requests.", file.getName()), new Exception());
+                                        throw new RequestException(String.format("Не удалось переместить вложение ФССП %s из каталога requests.", file.getFileName()), new Exception());
                                     } catch (ParserConfigurationException | SAXException e) {
-                                        throw new RequestException(String.format("Не удалось обработать вложение ФССП %s.", file.getName()), new Exception());
+                                        throw new RequestException(String.format("Не удалось обработать вложение ФССП %s.", file.getFileName()), new Exception());
                                     }
                                     request.process();
                                     request.log();
@@ -312,7 +316,7 @@ public class RequestProcessor extends Thread {
                                     break;
                                 }
                                 else {
-                                    throw new SignException(String.format("Подпись ЕГРН не инициализирована. Файл с вложением ФССП %s не обработан.", file.getName()), new Exception());
+                                    throw new SignException(String.format("Подпись ЕГРН не инициализирована. Файл с вложением ФССП %s не обработан.", file.getFileName()), new Exception());
                                 }
                             default:
                                 // Преобразуем запрос в ClientMessage
@@ -322,31 +326,31 @@ public class RequestProcessor extends Thread {
                         }
                         // Если не выкинуто исключение, то переносим файл в каталог processed
                         // Перезаписываем существующий файл, потому что ИС УВ может посылать одинаковые файлы в разные дни
-                        Path target = processedDir.resolve(file.toPath().getFileName());
+                        Path target = processedDir.resolve(file.getFileName());
                         try {
-                            Files.move(file.toPath(), target, StandardCopyOption.REPLACE_EXISTING);
+                            Files.move(file, target, StandardCopyOption.REPLACE_EXISTING);
                             filesNum++; // Увеличиваем счетчик успешно обработанных файлов
                         } catch (IOException e) {
-                            LOG.error("Не получается переместить файл " + file.toString());
+                            LOG.error("Не получается переместить файл " + file.getFileName());
                         }
                     } catch (RequestException e) {
                         // Логируем исключение и переносим файл в каталог failed
                         LOG.error(e.getMessage());
-                        Path target = failedDir.resolve(file.toPath().getFileName());
+                        Path target = failedDir.resolve(file.getFileName());
                         try {
-                            Files.move(file.toPath(), target, StandardCopyOption.REPLACE_EXISTING);
+                            Files.move(file, target, StandardCopyOption.REPLACE_EXISTING);
                         } catch (IOException ex) {
-                            LOG.error(String.format("Не удалось переместить файл %s в каталог failed", file.toString()));
+                            LOG.error(String.format("Не удалось переместить файл %s в каталог failed", file.getFileName()));
                         }
                         // Очищаем каталог sign на всякий случай
                         clearSignDir();
                     } catch (OverlimitException e) {
                         // Переносим файл в каталог overlimit
-                        Path target = overlimitDir.resolve(file.toPath().getFileName());
+                        Path target = overlimitDir.resolve(file.getFileName());
                         try {
-                            Files.move(file.toPath(), target, StandardCopyOption.REPLACE_EXISTING);
+                            Files.move(file, target, StandardCopyOption.REPLACE_EXISTING);
                         } catch (IOException ex) {
-                            LOG.error(String.format("Не удалось переместить файл %s в каталог overlimit", file.toString()));
+                            LOG.error(String.format("Не удалось переместить файл %s в каталог overlimit", file.getFileName()));
                         }
                     } catch (SignException e) {
                         // Пытаемся заново инициализировать подписи
@@ -388,12 +392,19 @@ public class RequestProcessor extends Thread {
                         // Файл, на котором было выброшено исключение, оставляется в папке requests
                         // и будет обработан при восстановлении подписей
                     } catch (ParsingException e) {
-                        // Эта ошибка возникает при попытке обработать файл, копирование которого не завершено.
-                        // Поэтому здесь ничего не делаем, оставляя файл в requests для повторной обработки.
+                        // Файл, который не удалось распарсить переносим в каталог failed
+                        Path target = failedDir.resolve(file.getFileName());
+                        try {
+                            Files.move(file, target, StandardCopyOption.REPLACE_EXISTING);
+                        } catch (IOException ex) {
+                            LOG.error(String.format("Не удалось переместить файл %s в каталог failed", file.getFileName()));
+                        }
+                        // Очищаем каталог sign на всякий случай
+                        clearSignDir();
                     }
                 }
             }
-            LOG.info(String.format("Обработано %d запросов из %d.", filesNum, files.length - 5));
+            LOG.info(String.format("Обработано %d запросов из %d.", filesNum, files.stream().toArray().length));
             // После обработки всех файлов сохраняем счетчики в базе данных
             try {
                 vsCounter.saveVSCounter(new Date(currentDate.getTimeInMillis()));
@@ -449,17 +460,19 @@ public class RequestProcessor extends Thread {
             LOG.info("Счетчики ВС обнулены.");
 
             // Файлы с запросами переносятся из каталога overlimited в рабочий каталог
-            File[] files = overlimitDir.toFile().listFiles();
-            for (File file : files) {
-                Path target = inputDir.resolve(file.toPath().getFileName());
-                try {
-                    Files.move(file.toPath(), target);
-                } catch (IOException e) {
-                    LOG.error("Ошибка при обработке OVERLIMITED запросов.");
-                    LOG.error(e.getMessage());
+            File[] overlimitedFiles = overlimitDir.toFile().listFiles();
+            if (overlimitedFiles != null) {
+                for (File overlimitFile : overlimitedFiles) {
+                    Path target = inputDir.resolve(overlimitFile.toPath().getFileName());
+                    try {
+                        Files.move(overlimitFile.toPath(), target);
+                    } catch (IOException e) {
+                        LOG.error("Ошибка при обработке OVERLIMITED запросов.");
+                        LOG.error(e.getMessage());
+                    }
                 }
+                LOG.info("OVERLIMIT запросы перенесены в рабочий каталог.");
             }
-            LOG.info("OVERLIMIT запросы перенесены в рабочий каталог.");
 
             // И меняем текущую дату на сию секунду
             currentDate = justMomentDate;
@@ -471,28 +484,28 @@ public class RequestProcessor extends Thread {
      * Метод очищает каталог sign после обработки запросов с подписями или после исключения RequestException
      */
     public static void clearSignDir() {
-        File[] files = signDir.toFile().listFiles();
-        if (files.length == 0) {
+        File[] signedFiles = signDir.toFile().listFiles();
+        if (signedFiles != null && signedFiles.length == 0) {
             return;
         }
         // Хранилище для проблемных файлов
         List<File> deniedFiles = new LinkedList<>();
-        for (File file : files) {
+        for (File signedFile : signedFiles) {
             // Пытаемся удалить текущий файл
             try {
-                Files.delete(file.toPath());
+                Files.delete(signedFile.toPath());
             } catch (IOException e) {
                 // В случае неудачи (файл чем-то занят, например) помещаем его в отдельный список
-                deniedFiles.add(file);
+                deniedFiles.add(signedFile);
             }
         }
         if (!deniedFiles.isEmpty()) {
             // Еще раз пытаемся удалить файлы из проблемного списка
-            for (File file : deniedFiles) {
+            for (File deniedFile : deniedFiles) {
                 try {
-                    Files.delete(file.toPath());
+                    Files.delete(deniedFile.toPath());
                 } catch (IOException e) {
-                    LOG.info(String.format("Не удалось удалить файл %s из каталога %s.", file.getName(), file.getParent()));
+                    LOG.info(String.format("Не удалось удалить файл %s из каталога %s.", deniedFile.getName(), deniedFile.getParent()));
                     // Оставляем файл в каталоге до следующего раза, когда будет вызван этот метод
                 }
             }
@@ -515,6 +528,22 @@ public class RequestProcessor extends Thread {
         } catch (IOException e) {
             LOG.info(String.format("Файл %s недоступен для чтения.", file.getName()));
             return false;
+        }
+    }
+
+    /**
+     * Метод возвращает набор путей к файлам, находящимся в каталоге inputDir
+     * Из набора исключаются файлы, которые являются каталогами
+     * @return Set<Path> Набор файлов в каталоге с входящими запросами
+     */
+    private Set<Path> getFileList() {
+        try (Stream<Path> stream = Files.list(inputDir)) {
+            return stream
+                    .filter(file -> !Files.isDirectory(file))
+                    .collect(Collectors.toSet());
+        } catch (IOException e) {
+            LOG.error(e.getMessage());
+            throw new RuntimeException(e);
         }
     }
 }

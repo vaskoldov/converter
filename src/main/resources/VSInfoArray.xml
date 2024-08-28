@@ -99,7 +99,7 @@
 	</vsInfoEntry>
 	<vsInfoEntry>
 		<namespace>urn://x-artefacts-fns-ndfl2/root/260-10/4.1.1</namespace>
-		<!-- Название ВС не изменять - используется в коде конвертера -->		
+		<!-- Название ВС не изменять - используется в коде конвертера -->
 		<name>2-НДФЛ</name>
 		<timeout>30</timeout>
 		<dailyLimit>70000</dailyLimit>
@@ -200,6 +200,16 @@
 		<keywords>/*[local-name()="EGRNRequest"]/*[local-name()="requestDetails"]/*[local-name()="requestEGRNDataAction"]/*[local-name()="extractDataAction"]/*[local-name()="object"]/*[local-name()="cadastralNumber"]/*[local-name()="cadastralNumber"]/text()</keywords>
 	</vsInfoEntry>
 	<vsInfoEntry>
+		<namespace>http://rosreestr.ru/services/v0.26/TStatementRequestEGRN</namespace>
+		<!-- Название ВС не изменять - используется в коде конвертера -->
+		<!-- Новая версия заявления в ЕГРН требует формирования запроса по новой версии ВС ЕГРН -->
+		<name>ЕГРН_26</name>
+		<timeout>30</timeout>
+		<dailyLimit>70000</dailyLimit>
+		<priority>140</priority>
+		<keywords>/*[local-name()="EGRNRequest"]/*[local-name()="requestDetails"]/*[local-name()="requestEGRNDataAction"]/*[local-name()="extractDataAction"]/*[local-name()="object"]/*[local-name()="cadastralNumber"]/*[local-name()="cadastralNumber"]/text()</keywords>
+	</vsInfoEntry>
+	<vsInfoEntry>
 		<namespace>urn://x-artefacts-fns-dohflna/root/260-18/4.0.1</namespace>
 		<!-- Название ВС не изменять - используется в коде конвертера -->
 		<name>Доходы ФЛ НА</name>
@@ -241,7 +251,7 @@
 		<keywords>/*[local-name()="SnilsByAdditionalDataRequest"]/*[local-name()="FirstName"]/text()</keywords>
 		<keywords>/*[local-name()="SnilsByAdditionalDataRequest"]/*[local-name()="Patronymic"]/text()</keywords>
 	</vsInfoEntry>
-		<vsInfoEntry>
+	<vsInfoEntry>
 		<namespace>http://kvs.pfr.com/snils-by-additionalData/1.0.3</namespace>
 		<name>СНИЛС (1.0.3)</name>
 		<timeout>30</timeout>
@@ -312,7 +322,7 @@
 		<keywords>/*[local-name()="ExportChargesRequest"]/*[local-name()="ChargesExportConditions"]/*[local-name()="PayersConditions"]/*[local-name()="PayerIdentifier"]/text()</keywords>
 		<keywords>/*[local-name()="ExportChargesRequest"]/*[local-name()="ChargesExportConditions"]/*[local-name()="PayersConditions"]/*[local-name()="PayerInn"]/text()</keywords>
 	</vsInfoEntry>
-		<vsInfoEntry>
+	<vsInfoEntry>
 		<namespace>urn://roskazna.ru/gisgmp/xsd/services/export-charges/2.5.1</namespace>
 		<name>Предоставление необходимой для уплаты информации (2.5.1)</name>
 		<timeout>30</timeout>
@@ -518,6 +528,42 @@
 		<keywords>/*[local-name()="FLInfoRequest"]/*[local-name()="Документ"]/*[local-name()="СведФЛ"]/*[local-name()="ФИО"]/*[local-name()="Фамилия"]/text()</keywords>
 		<keywords>/*[local-name()="FLInfoRequest"]/*[local-name()="Документ"]/*[local-name()="СведФЛ"]/*[local-name()="ФИО"]/*[local-name()="Имя"]/text()</keywords>
 		<keywords>/*[local-name()="FLInfoRequest"]/*[local-name()="Документ"]/*[local-name()="СведФЛ"]/*[local-name()="ФИО"]/*[local-name()="Отчество"]/text()</keywords>
+	</vsInfoEntry>
+	<vsInfoEntry>
+		<namespace>urn://x-artefacts-fns-zaksvegrul/root/312-83/4.0.1</namespace>
+		<name>ЕГРЮЛ (новый 4.0.1)</name>
+		<timeout>30</timeout>
+		<dailyLimit>100000</dailyLimit>
+		<priority>210</priority>
+		<keywords>/*[local-name()="ZAKRSVEGRULRequest"]/*[local-name()="ЗапросЮЛ"]/*[local-name()="ИННЮЛ"]/text()</keywords>
+		<keywords>/*[local-name()="ZAKRSVEGRULRequest"]/*[local-name()="ЗапросЮЛ"]/*[local-name()="ОГРН"]/text()</keywords>
+	</vsInfoEntry>
+	<vsInfoEntry>
+		<namespace>urn://x-artefacts-fns-zaksvegrip/root/312-90/4.0.1</namespace>
+		<name>ЕГРИП (новый 4.0.1)</name>
+		<timeout>30</timeout>
+		<dailyLimit>100000</dailyLimit>
+		<priority>200</priority>
+		<keywords>/*[local-name()="ZAKSVEGRIPRequest"]/*[local-name()="ЗапросИП"]/*[local-name()="ИННФЛ"]/text()</keywords>
+		<keywords>/*[local-name()="ZAKSVEGRIPRequest"]/*[local-name()="ЗапросИП"]/*[local-name()="ОГРНИП"]/text()</keywords>
+	</vsInfoEntry>
+	<vsInfoEntry>
+		<namespace>urn://services-gibdd-ru/vehicle/1.0.3</namespace>
+		<name>Транспортные средства</name>
+		<timeout>30</timeout>
+		<dailyLimit>70000</dailyLimit>
+		<priority>300</priority>
+		<keywords>/*[local-name()="RequestVehicle"]/*[local-name()="Owner"]/*[local-name()="LastName"]/text()</keywords>
+		<keywords>/*[local-name()="RequestVehicle"]/*[local-name()="Owner"]/*[local-name()="FirstName"]/text()</keywords>
+		<keywords>/*[local-name()="RequestVehicle"]/*[local-name()="Owner"]/*[local-name()="MiddleName"]/text()</keywords>
+		<keywords>/*[local-name()="RequestVehicle"]/*[local-name()="Owner"]/*[local-name()="INN"]/text()</keywords>
+		<keywords>/*[local-name()="RequestVehicle"]/*[local-name()="Owner"]/*[local-name()="OGRN"]/text()</keywords>
+		<keywords>/*[local-name()="RequestVehicle"]/*[local-name()="Vehicle"]/*[local-name()="RegNo"]/text()</keywords>
+		<keywords>/*[local-name()="RequestVehicle"]/*[local-name()="Vehicle"]/*[local-name()="VIN"]/text()</keywords>
+		<keywords>/*[local-name()="RequestVehicle"]/*[local-name()="Vehicle"]/*[local-name()="ChassisNumber"]/text()</keywords>
+		<keywords>/*[local-name()="RequestVehicle"]/*[local-name()="Vehicle"]/*[local-name()="BodyNumber"]/text()</keywords>
+		<keywords>/*[local-name()="RequestVehicle"]/*[local-name()="Vehicle"]/*[local-name()="RegDocNumber"]/text()</keywords>
+		<keywords>/*[local-name()="RequestVehicle"]/*[local-name()="Vehicle"]/*[local-name()="PTSNumber"]/text()</keywords>
 	</vsInfoEntry>
 	<!-- 
 ================= Неиспользуемые виды сведений =================

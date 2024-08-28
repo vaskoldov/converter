@@ -35,20 +35,26 @@ public class XMLTransformer {
     private static final String ToClientMessageStylesheet = "./src/main/resources/ClientMessage.xslt";
     private static final String FromQueryResultStyleSheet = "./src/main/resources/FromQueryResult.xslt";
     private static final String ToEGRNTechDescStylesheet = "./src/main/resources/EGRNStatement2TechDesc.xslt";
+    // Новая версия технического описания ЕГРН
+    private static final String ToEGRNTechDesc26Stylesheet = "./src/main/resources/EGRNStatement2TechDesc26.xslt";
     private static final String ToEGRNMainRequestStylesheet = "./src/main/resources/EGRNStatement2Request.xslt";
+    // Новая версия запроса по ВС ЕГРН
+    private static final String ToEGRNMainRequest26Stylesheet = "./src/main/resources/EGRNStatement2Request26.xslt";
     private static final String ToESIAClientMessage = "./src/main/resources/ESIA.xslt";
     private static final String ToFSSPRequest = "./src/main/resources/FSSPStatement2Request.xslt";
     private static final String SplitFSSPRequest = "./src/main/resources/SplitFSSPRequest.xslt";
     private static final String ToFSSPResponse = "./src/main/resources/AnswerToFSSPRequest.xslt";
 
-    private static Logger LOG = LoggerFactory.getLogger(XMLTransformer.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(XMLTransformer.class.getName());
     private static DocumentBuilderFactory factory;
     private static DocumentBuilder builder;
     private static TransformerFactory transformerFactory;
     private static Transformer transformerToClientMessage;
     private static Transformer transformerFromQueryResult;
     private static Transformer transformerEGRNToTechDesc;
+    private static Transformer transformerEGRNToTechDesc26;
     private static Transformer transformerEGRNToMainRequest;
+    private static Transformer transformerEGRNToMainRequest26;
     private static Transformer transformerESIAToClientMessage;
     private static Transformer transformerFSSPToRequest;
     private static Transformer transformerFSSPRequestToResponse;
@@ -65,44 +71,34 @@ public class XMLTransformer {
             transformerFactory = TransformerFactory.newInstance();
 
             // Создаем трансформер для преобразования бизнес-запроса в конверт адаптера
-            File toClientMessageStylesheet = new File(ToClientMessageStylesheet);
-            StreamSource toClientMessageStyleSource = new StreamSource(toClientMessageStylesheet);
-            transformerToClientMessage = transformerFactory.newTransformer(toClientMessageStyleSource);
+            transformerToClientMessage = transformerFactory.newTransformer(new StreamSource(new File(ToClientMessageStylesheet)));
 
             // Создаем трансформер для извлечения бизнес-ответа (содержимого content) из конверта адаптера
-            File fromQueryResultStylesheet = new File(FromQueryResultStyleSheet);
-            StreamSource fromQueryResultStyleSource = new StreamSource(fromQueryResultStylesheet);
-            transformerFromQueryResult = transformerFactory.newTransformer(fromQueryResultStyleSource);
+            transformerFromQueryResult = transformerFactory.newTransformer(new StreamSource(new File(FromQueryResultStyleSheet)));
 
             // Создаем трансформер для преобразования заявления ЕГРН в техническое описание
-            File toEGRNTechDescStylesheet = new File(ToEGRNTechDescStylesheet);
-            StreamSource toEGRNTechDescStyleSource = new StreamSource(toEGRNTechDescStylesheet);
-            transformerEGRNToTechDesc = transformerFactory.newTransformer(toEGRNTechDescStyleSource);
+            transformerEGRNToTechDesc = transformerFactory.newTransformer(new StreamSource(new File(ToEGRNTechDescStylesheet)));
+
+            // Создаем трансформер для преобразования заявления ЕГРН в техническое описание версии v.0.26
+            transformerEGRNToTechDesc26 = transformerFactory.newTransformer(new StreamSource(new File(ToEGRNTechDesc26Stylesheet)));
 
             // Создаем трансформер для преобразования заявления ЕГРН в основной запрос
-            File toEGRNMainRequestStyleSheet = new File(ToEGRNMainRequestStylesheet);
-            StreamSource toEGRNMainRequestStyleSource = new StreamSource(toEGRNMainRequestStyleSheet);
-            transformerEGRNToMainRequest = transformerFactory.newTransformer(toEGRNMainRequestStyleSource);
+            transformerEGRNToMainRequest = transformerFactory.newTransformer(new StreamSource(new File(ToEGRNMainRequestStylesheet)));
+
+            // Создаем трансформер для преобразования заявления ЕГРН в основной запрос по версии 1.2.2
+            transformerEGRNToMainRequest26 = transformerFactory.newTransformer(new StreamSource(new File(ToEGRNMainRequest26Stylesheet)));
 
             // Создаем трансформер для преобразования запроса персональных данных пользователя ЕСИА в ClientMessage
-            File toESIAClientMessageStylesheet = new File(ToESIAClientMessage);
-            StreamSource toESIAClientMessageStyleSource = new StreamSource(toESIAClientMessageStylesheet);
-            transformerESIAToClientMessage = transformerFactory.newTransformer(toESIAClientMessageStyleSource);
+            transformerESIAToClientMessage = transformerFactory.newTransformer(new StreamSource(new File(ToESIAClientMessage)));
 
             // Создаем трансформер для преобразования вложения ФССП в ClientMessage
-            File toFSSPClientMessageStylesheet = new File(ToFSSPRequest);
-            StreamSource toFSSPClientMessageStyleSource = new StreamSource(toFSSPClientMessageStylesheet);
-            transformerFSSPToRequest = transformerFactory.newTransformer(toFSSPClientMessageStyleSource);
+            transformerFSSPToRequest = transformerFactory.newTransformer(new StreamSource(new File(ToFSSPRequest)));
 
             // Создаем трансформер для преобразования запроса ФССП в ответ ИС УВ
-            File splitFSSPRequestStylesheet = new File(SplitFSSPRequest);
-            StreamSource splitFSSPRequestStyleSource = new StreamSource(splitFSSPRequestStylesheet);
-            transformerFSSPRequestToResponse = transformerFactory.newTransformer(splitFSSPRequestStyleSource);
+            transformerFSSPRequestToResponse = transformerFactory.newTransformer(new StreamSource(new File(SplitFSSPRequest)));
 
             // Создаем трансформер для формирования ответа ФССП
-            File AnswerFSSPRequestStylesheet = new File(ToFSSPResponse);
-            StreamSource AnswerFSSPRequestStyleSource = new StreamSource(AnswerFSSPRequestStylesheet);
-            transformerAnswerFSSPRequest = transformerFactory.newTransformer(AnswerFSSPRequestStyleSource);
+            transformerAnswerFSSPRequest = transformerFactory.newTransformer(new StreamSource(new File(ToFSSPResponse)));
 
             // Создаем обработчик XPath запросов
             xpathFactory = XPathFactory.newInstance();
@@ -192,20 +188,28 @@ public class XMLTransformer {
         transformerFromQueryResult.transform(source, target);
     }
 
-    public synchronized static File createTechDesc(File egrnRequest) throws ParserConfigurationException, SAXException, IOException, TransformerException {
+    public synchronized static File createTechDesc(File egrnRequest, String vsName ) throws ParserConfigurationException, SAXException, IOException, TransformerException {
         // Запрос в преобразовании не участвует, но для удовлетворения сигнатуры метода
         // ему нужно подать DOMSource, который получаем из элемента egrnDom
         Element egrnDom = AbstractTools.fileToElement(egrnRequest);
         DOMSource source = new DOMSource(egrnDom.getOwnerDocument());
-        transformerEGRNToTechDesc.setParameter("fileName", egrnRequest.getName());
         // Определяем файл с результатом преобразования (он всегда называется request.xml)
         File targetFile = RequestProcessor.signDir.resolve("request.xml").toFile();
         StreamResult target = new StreamResult(targetFile);
-        transformerEGRNToTechDesc.transform(source, target);
+        switch (vsName) {
+            case "ЕГРН":
+                transformerEGRNToTechDesc.setParameter("fileName", egrnRequest.getName());
+                transformerEGRNToTechDesc.transform(source, target);
+                break;
+            case "ЕГРН_26":
+                transformerEGRNToTechDesc26.setParameter("fileName", egrnRequest.getName());
+                transformerEGRNToTechDesc26.transform(source, target);
+                break;
+        }
         return targetFile;
     }
 
-    public synchronized static File createMainRequest(File egrnStatement, String clientID) throws ParserConfigurationException, SAXException, IOException, TransformerException, XPathExpressionException {
+    public synchronized static File createMainRequest(File egrnStatement, String clientID, String vsName) throws ParserConfigurationException, SAXException, IOException, TransformerException, XPathExpressionException {
         // Получаем корневой элемент из заявления
         Element egrnElement = AbstractTools.fileToElement(egrnStatement);
         // Извлекаем значения параметров для преобразования
@@ -213,16 +217,27 @@ public class XMLTransformer {
         String regionCode = getRegionCode(egrnElement);
         String fileName = egrnStatement.getName();
         // Преобразовываем заявления и параметры в основной запрос для ClientMessage,
-        // который сохраняется с расширением .cm
+        // который сохраняется с расширением .cm (ClientMessage)
         String targetFileName = egrnStatement.getName() + ".cm";
         File targetFile = RequestProcessor.inputDir.resolve(targetFileName).toFile();
         StreamResult target = new StreamResult(targetFile);
         DOMSource source = new DOMSource(egrnElement.getOwnerDocument());
-        transformerEGRNToMainRequest.setParameter("regionCode", regionCode);
-        transformerEGRNToMainRequest.setParameter("actionCode", actionCode);
-        transformerEGRNToMainRequest.setParameter("fileName", fileName);
-        transformerEGRNToMainRequest.setParameter("clientID", clientID);
-        transformerEGRNToMainRequest.transform(source, target);
+        switch (vsName) {
+            case "ЕГРН":
+                transformerEGRNToMainRequest.setParameter("regionCode", regionCode);
+                transformerEGRNToMainRequest.setParameter("actionCode", actionCode);
+                transformerEGRNToMainRequest.setParameter("fileName", fileName);
+                transformerEGRNToMainRequest.setParameter("clientID", clientID);
+                transformerEGRNToMainRequest.transform(source, target);
+                break;
+            case "ЕГРН_26":
+                transformerEGRNToMainRequest26.setParameter("regionCode", regionCode);
+                transformerEGRNToMainRequest26.setParameter("actionCode", actionCode);
+                transformerEGRNToMainRequest26.setParameter("fileName", fileName);
+                transformerEGRNToMainRequest26.setParameter("clientID", clientID);
+                transformerEGRNToMainRequest26.transform(source, target);
+                break;
+        }
         return targetFile;
     }
 
@@ -327,8 +342,7 @@ public class XMLTransformer {
         String query = String.format("//*[local-name()='%s']/text()", tagName);
         try {
             XPathExpression exp = xpath.compile(query);
-            String result = (String) exp.evaluate(root, XPathConstants.STRING);
-            return result;
+            return  (String) exp.evaluate(root, XPathConstants.STRING);
         } catch (XPathExpressionException e) {
             return null;
         }
