@@ -215,7 +215,7 @@ public class RequestProcessor extends Thread {
 
     @Override
     public void run() {
-        //LOG.info(String.format("Параметр запуска потока isRunnable: %s.", Boolean.toString(isRunnable)));
+        LOG.info(String.format("Параметр запуска потока isRunnable: %s.", Boolean.toString(isRunnable)));
         while (isRunnable) {
             // Проверяем переход суток, чтобы сбросить счетчики отправленных запросов,
             // очистить базу данных H2 и перенести overlimited запросы в каталог requests
