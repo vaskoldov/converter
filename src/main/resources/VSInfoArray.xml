@@ -208,6 +208,7 @@
 		<dailyLimit>70000</dailyLimit>
 		<priority>140</priority>
 		<keywords>/*[local-name()="EGRNRequest"]/*[local-name()="requestDetails"]/*[local-name()="requestEGRNDataAction"]/*[local-name()="extractDataAction"]/*[local-name()="object"]/*[local-name()="cadastralNumber"]/*[local-name()="cadastralNumber"]/text()</keywords>
+		<keywords>/*[local-name()="EGRNRequest"]/*[local-name()="requestDetails"]/*[local-name()="requestCopyAction"]/*[local-name()="object"]/*[local-name()="objectCadastralNumber"]/text()</keywords>
 	</vsInfoEntry>
 	<vsInfoEntry>
 		<namespace>urn://x-artefacts-fns-dohflna/root/260-18/4.0.1</namespace>

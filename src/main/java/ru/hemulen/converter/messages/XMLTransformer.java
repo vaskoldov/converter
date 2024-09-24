@@ -279,8 +279,14 @@ public class XMLTransformer {
             // определяем код региона из кадастрового номера объекта недвижимости
             String cadastralNumberQuery = "//*[local-name()='cadastralNumber']/*[local-name()='cadastralNumber']";
             exp = xpath.compile(cadastralNumberQuery);
-            Object cadastralNumberResult = exp.evaluate(egrnDom, XPathConstants.STRING);
-            if (cadastralNumberResult != null) {
+            String cadastralNumberResult = (String) exp.evaluate(egrnDom, XPathConstants.STRING);
+            if (cadastralNumberResult.isEmpty()) {
+                // Пробуем другой вариант поиска кадастрового номера, используемого в запросах requestCopyAction
+                cadastralNumberQuery = "//*[local-name()='objectCadastralNumber']";
+                exp = xpath.compile(cadastralNumberQuery);
+                cadastralNumberResult = (String) exp.evaluate(egrnDom, XPathConstants.STRING);
+            }
+            if (! cadastralNumberResult.isEmpty()) {
                 String[] cadastralNumberParts = ((String) cadastralNumberResult).split(":");
                 regionCode = cadastralNumberParts[0];
                 if (regionCode.length() == 1) {

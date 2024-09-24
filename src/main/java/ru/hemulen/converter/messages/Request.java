@@ -247,6 +247,7 @@ public class Request {
         File techDesc;
         try {
             techDesc = XMLTransformer.createTechDesc(statement, vsName);
+            LOG.info("***TEST*** Сформировано техническое описание к запросу " + requestFile.getName());
         } catch (ParserConfigurationException | SAXException | IOException | TransformerException e) {
             LOG.error(e.getMessage());
             throw new RequestException(String.format("Не удалось преобразовать заявление ЕГРН %s в техническое описание.", statement.getName()), e);
@@ -256,7 +257,9 @@ public class Request {
         File techDescSign;
         try {
             statementSign = RequestProcessor.egrnSigner.signPKCS7Detached(statement);
+            LOG.info("***TEST*** Подписан запрос EGRNRequest " + requestFile.getName());
             techDescSign = RequestProcessor.egrnSigner.signPKCS7Detached(techDesc);
+            LOG.info("***TEST*** Подписано техническое описание к запросу " + requestFile.getName());
         } catch (IOException e) {
             LOG.error(e.getMessage());
             throw new RequestException(String.format("Файловая проблема с элементами вложения к заявлению ЕГРН %s.", statement.getName()), e);
@@ -274,6 +277,7 @@ public class Request {
         try {
             Files.createDirectory(attachmentFolder);
             AbstractTools.zipElements(new File[]{statement, statementSign, techDesc, techDescSign}, attachmentFile.toString());
+            LOG.info("***TEST*** Сформирован архив вложения к запросу " + requestFile.getName());
         } catch (IOException e) {
             LOG.error(e.getMessage());
             throw new RequestException(String.format("Не удалось заархивировать файл вложения для заявления ЕГРН %s.", statement.getName()), e);
@@ -282,6 +286,7 @@ public class Request {
         File attachmentSign;
         try {
             attachmentSign = RequestProcessor.egrnSigner.signPKCS7Detached(attachmentFile.toFile());
+            LOG.info("***TEST*** Подписан архив вложения к запросу " + requestFile.getName());
         } catch (IOException e) {
             LOG.error(e.getMessage());
             throw new RequestException(String.format("Файловая проблема с вложением для заявления ЕГРН %s.", statement.getName()), e);
@@ -295,6 +300,7 @@ public class Request {
         File mainRequestFile;
         try {
             mainRequestFile = XMLTransformer.createMainRequest(this.requestFile, this.clientID, vsName);
+            LOG.info("***TEST*** Сформирован ClientMessage с запросом " + requestFile.getName());
             // Перезаписываем исходный файл с заявлением файлом с основным запросом
             Files.move(mainRequestFile.toPath(), this.requestFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
         } catch (ParserConfigurationException | SAXException | IOException | TransformerException |
