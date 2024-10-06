@@ -32,6 +32,8 @@ import java.util.zip.ZipOutputStream;
 
 public class Response {
     private final static Logger LOG = LoggerFactory.getLogger(Response.class.getName());
+    private final static String FSSP_NAMESPACE = "urn://x-artifacts-fssp-ru/mvv/smev3/application-documents/1.1.1";
+    private final static String EGRN_NAMESPACE = "urn://x-artefacts-rosreestr-gov-ru/virtual-services/egrn-statement/1.2.2";
     private File responseFile;
     private Document responseDOM;
     private File resultFile;
@@ -48,6 +50,7 @@ public class Response {
     private Boolean isESIAResponse; // Признак, что ответ пришел во второй instance адаптера
     private Boolean isFSSPRequest;  // Признак, что ответ является входящим запросом ФССП
     private Boolean isFSSPResponse; // Признак, что ответ является ответом ФССП (там по-другому обрабатываются статусы)
+    private Boolean isEGRNResponse; // Признак, что ответ является ответом ЕГРН (в новой версии ВС по другому обрабатываются статусы)
 
     public Response(File responseFile) throws ResponseException, ParsingException {
         // Определяем, в каком каталоге находится обрабатываемый запрос
@@ -59,18 +62,25 @@ public class Response {
             this.responseDOM = XMLTransformer.fileToDocument(responseFile);
             Element root = this.responseDOM.getDocumentElement();
             // Проверяем, что ответ является входящим запросом ФССП
-            NodeList fsspRequest = root.getElementsByTagNameNS("urn://x-artifacts-fssp-ru/mvv/smev3/application-documents/1.1.1", "ApplicationDocumentsRequest");
+            NodeList fsspRequest = root.getElementsByTagNameNS(FSSP_NAMESPACE, "ApplicationDocumentsRequest");
             if (fsspRequest.getLength() != 0) {
                 isFSSPRequest = true;
             } else {
                 isFSSPRequest = false;
             }
             // Проверяем, что ответ является ответом ФССП
-            NodeList fsspResponse = root.getElementsByTagNameNS("urn://x-artifacts-fssp-ru/mvv/smev3/application-documents/1.1.1", "ApplicationDocumentsResponse");
+            NodeList fsspResponse = root.getElementsByTagNameNS(FSSP_NAMESPACE, "ApplicationDocumentsResponse");
             if (fsspResponse.getLength() != 0) {
                 isFSSPResponse = true;
             } else {
                 isFSSPResponse = false;
+            }
+            // Проверяем, что ответ является ответом по новой версии ЕГРН
+            NodeList egrnResponse = root.getElementsByTagNameNS(EGRN_NAMESPACE,"Response");
+            if (egrnResponse.getLength() != 0) {
+                isEGRNResponse = true;
+            } else {
+                isEGRNResponse = false;
             }
             // Считываем clientID ответа
             NodeList clientIDNodes = root.getElementsByTagName("clientId");
@@ -82,7 +92,7 @@ public class Response {
                     // Запросы ФССП обрабатываются по отдельному алгоритму, поэтому здесь не заполняем остальные члены класса
                     return;
                 }
-            // Считываем messageID ответа (начиная с версии 3.1.8 каталоги с вложениями именуются по MessageId ответа)
+            // Считываем messageID ответа
             NodeList messageIDNodes = root.getElementsByTagName("MessageId");
             if (messageIDNodes.getLength() != 0) {
                 messageID = messageIDNodes.item(0).getTextContent();
@@ -101,6 +111,23 @@ public class Response {
                 }
                 if (responseType.equals("PrimaryMessage") && isFSSPResponse) {
                     responseType = "FSSPBusinessStatus";
+                }
+                // В ответах новой версии ЕГРН смотрим на статусы - не все они являются финальными
+                if (responseType.equals("PrimaryMessage") && isEGRNResponse) {
+                    String code = root.getElementsByTagNameNS(EGRN_NAMESPACE, "code").item(0).getTextContent();
+                    switch (code) {
+                        case "8":   // Принято от заявителя
+                        case "10":  // Ожидание оплаты
+                        case "5":   // Передача обращения в работу
+                        case "7":   // Приостановление обработки
+                        case "9":   // Возобновление обработки
+                            responseType = "BusinessStatus";
+                            break;
+                        case "4":   // Завершение обработки
+                        default:
+                            // responseType не изменяется
+                            break;
+                    }
                 }
             } else {
                 // Если нельзя определить тип ответа, то нельзя и обработать его - выбрасываем исключение
@@ -181,14 +208,14 @@ public class Response {
                 // Формируем архив из XML ответа и файлов вложений, который сохраняется с именем исходного запроса и расширением ZIP
                 for (int i = 0; i < attachmentHeaders.getLength(); i++) {
                     Element attachmentHeader = (Element) attachmentHeaders.item(i);
-                    // Имя каталога с файлом - это элемент Id из AttachmentHeader
+                    // Имя каталога с файлом - это элемент Id из AttachmentHeader, если файл передан через FTP
                     Path attachmentPath = null;
                     NodeList attachmentPathNodes = attachmentHeader.getElementsByTagName("Id");
                     if (attachmentPathNodes.getLength() != 0) {
                         attachmentPath = Paths.get(attachmentPathNodes.item(0).getTextContent());
                     }
-                    // Получаем имя подкаталога вложений из элемента clientID - тоже новшество 4.0, но работает
-                    // не для всех ВС, почему-то. Вложения ЕИСУКС создаются в подкаталогах, ЕГРН - нет.
+                    // Получаем имя подкаталога вложений из элемента clientID - это второй подкаталог, если файл передан через FTP
+                    // Если файл передан MTOM (внутри ответа), то clientID - имя первого подкаталога в attachmentDir
                     Path attachmentSubfolder = Paths.get(clientID);
                     // Получаем имя файла
                     Path attachmentFile = null;
@@ -197,15 +224,11 @@ public class Response {
                         attachmentFile = Paths.get(attachmentFileNodes.item(0).getTextContent());
                     }
 
-                    // Проверяем первый вариант пути в base-storage: каталог id из <AttachmentHeader>
-                    Path attachmentFilePath = attachmentDir.resolve(attachmentPath).resolve(attachmentFile);
+                    // Проверяем первый вариант пути в base-storage для FTP-вложений: каталог Id/clientId
+                    Path attachmentFilePath = attachmentDir.resolve(attachmentPath).resolve(attachmentSubfolder).resolve(attachmentFile);
                     if (!attachmentFilePath.toFile().exists()) {
-                        // Если файл не существует, то проверяем второй вариант пути в base-storage: каталог id из <AttachmentHeader> + clientID ответа
-                        attachmentFilePath = attachmentDir.resolve(attachmentPath).resolve(attachmentSubfolder).resolve(attachmentFile);
-                        if (!attachmentFilePath.toFile().exists()) {
-                            // Если файл не существует, то проверяем третий вариант пути в base-storage: каталог clientID ответа
-                            attachmentFilePath = attachmentDir.resolve(attachmentSubfolder).resolve(attachmentFile);
-                        }
+                        // Если файл не существует, то проверяем второй вариант пути в base-storage для MTOM-вложений: каталог clientId
+                        attachmentFilePath = attachmentDir.resolve(attachmentSubfolder).resolve(attachmentFile);
                     }
                     if (attachmentFilePath.toFile().exists()) {
                         // Если attachmentFilePath существует, то добавляем файл в список
@@ -219,7 +242,7 @@ public class Response {
                             LOG.error(e.getMessage());
                         }
                         // Выбрасываем ошибку обработки ответа и разбираемся потом вручную
-                        throw new ResponseException(String.format("Отсутствует файл вложения %s к запросу %s.", attachmentPath.toString(), requestFileName), new Exception());
+                        throw new ResponseException(String.format("Отсутствует файл вложения %s к запросу %s.", attachmentPath, requestFileName), new Exception());
                     }
                 }
                 // Расширение resultFile меняем с XML на ZIP
@@ -285,25 +308,51 @@ public class Response {
      */
     public void processBusinessStatus() {
         Element root = responseDOM.getDocumentElement();
-        NodeList nodeList = root.getElementsByTagName("code");
-        if (nodeList.getLength() != 0) {
-            errCode = nodeList.item(0).getTextContent();
-        }
-        nodeList = root.getElementsByTagName("description");
-        if (nodeList.getLength() != 0) {
-            errDescription = nodeList.item(0).getTextContent();
-        }
-        // Обрабатываем массив parameter
-        nodeList = root.getElementsByTagName("parameter");
-        for (int i = 0; i < nodeList.getLength(); i++) {
-            Element parameter = (Element) nodeList.item(0);
-            NodeList key = parameter.getElementsByTagName("key");
-            if (key.getLength() != 0) {
-                errDescription += "; " + key.item(0).getTextContent();
+        NodeList nodeList;
+        if (isEGRNResponse) {
+            nodeList = root.getElementsByTagNameNS(EGRN_NAMESPACE, "code");
+            if (nodeList.getLength() != 0) {
+                errCode = nodeList.item(0).getTextContent();
             }
-            NodeList value = parameter.getElementsByTagName("value");
-            if (value.getLength() != 0) {
-                errDescription += ":" + value.item(0).getTextContent();
+            nodeList = root.getElementsByTagNameNS(EGRN_NAMESPACE, "name");
+            if (nodeList.getLength() != 0) {
+                errDescription = nodeList.item(0).getTextContent();
+            }
+            // Обрабатываем StateDescription
+            nodeList = root.getElementsByTagNameNS(EGRN_NAMESPACE, "StateDescription");
+            if (nodeList.getLength() != 0) {
+                errDescription += ";" + nodeList.item(0).getTextContent();
+            }
+            // Обрабатываем StateParameter
+            nodeList = root.getElementsByTagNameNS(EGRN_NAMESPACE, "StateParameter");
+            for (int i = 0; i < nodeList.getLength(); i++) {
+                Element stateParameter = (Element) nodeList.item(i);
+                NodeList key = stateParameter.getElementsByTagNameNS(EGRN_NAMESPACE, "Key");
+                errCode += ";" + key.item(0).getTextContent();
+                NodeList value = stateParameter.getElementsByTagNameNS(EGRN_NAMESPACE, "Value");
+                errDescription += ";" + value.item(0).getTextContent();
+            }
+        } else {
+            nodeList = root.getElementsByTagName("code");
+            if (nodeList.getLength() != 0) {
+                errCode = nodeList.item(0).getTextContent();
+            }
+            nodeList = root.getElementsByTagName("description");
+            if (nodeList.getLength() != 0) {
+                errDescription = nodeList.item(0).getTextContent();
+            }
+            // Обрабатываем массив parameter
+            nodeList = root.getElementsByTagName("parameter");
+            for (int i = 0; i < nodeList.getLength(); i++) {
+                Element parameter = (Element) nodeList.item(i);
+                NodeList key = parameter.getElementsByTagName("key");
+                if (key.getLength() != 0) {
+                    errDescription += "; " + key.item(0).getTextContent();
+                }
+                NodeList value = parameter.getElementsByTagName("value");
+                if (value.getLength() != 0) {
+                    errDescription += ":" + value.item(0).getTextContent();
+                }
             }
         }
     }

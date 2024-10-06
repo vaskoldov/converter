@@ -16,7 +16,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.sql.SQLException;
+import java.util.Iterator;
 import java.util.Properties;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Класс выполняет сканирование каталога с ответами адаптера, определенного в параметре INTEGRATION_IN конфигурации.
@@ -101,9 +105,9 @@ public class ResponseProcessor extends Thread {
         //LOG.info(String.format("Параметр запуска потока isRunnable: %s.", Boolean.toString(isRunnable)));
         while (isRunnable) {
             // Читаем файлы в каталоге ответов
-            File[] files = inputDir.toFile().listFiles();
+            Set<Path> files = getFileList();
             //LOG.info(String.format("Количество элементов (включая подкаталоги) в IN: %d.", files.length));
-            if (files.length <= 2) {
+            if (files.isEmpty()) {
                 // Каталог пуст, не считая подкаталогов processed и failed - спим какое-то время и снова опрашиваем каталог
                 try {
                     LOG.info("Ответы отсутствуют.");
@@ -113,12 +117,14 @@ public class ResponseProcessor extends Thread {
                 }
                 continue;
             }
+            Iterator<Path> iterator = files.iterator();
             int filesNum = 0; // Счетчик ответов
-            for (File file : files) {
-                if (!file.isDirectory() && isFileAccessible(file)) {
+            while (iterator.hasNext()) {
+                Path file = iterator.next();
+                if (isFileAccessible(file.toFile())) {
                     // Создаем объект Response
                     try {
-                        Response response = new Response(file);
+                        Response response = new Response(file.toFile());
                         // Определяем тип ответа
                         String responseType = response.getType();
                         switch (responseType) {
@@ -161,40 +167,40 @@ public class ResponseProcessor extends Thread {
                             default:
                                 // Не удалось определить статус ответа
                                 // Выкидываем исключение и помещаем ответ в failed для последующего разбора
-                                throw new ResponseException("Неизвестный тип ответа " + file.getName(), new Exception());
+                                throw new ResponseException("Неизвестный тип ответа " + file.getFileName(), new Exception());
                         }
                         // Перемещаем обработанный ответ в каталог processed
-                        Path target = processedDir.resolve(file.toPath().getFileName());
-                        Files.move(file.toPath(), target, StandardCopyOption.REPLACE_EXISTING);
+                        Path target = processedDir.resolve(file.getFileName());
+                        Files.move(file, target, StandardCopyOption.REPLACE_EXISTING);
                         filesNum++; // Увеличиваем счетчик ответов
                     } catch (ResponseException | SQLException e) {
                         LOG.error(e.getMessage());
-                        LOG.info(String.format("Не удалось обработать ответ %s.", file.getName()));
+                        LOG.info(String.format("Не удалось обработать ответ %s.", file.getFileName()));
 
                         // Перемещаем файл с ответом, вызвавший исключение, в каталог failed
-                        Path target = failedDir.resolve(file.toPath().getFileName());
+                        Path target = failedDir.resolve(file.getFileName());
                         try {
-                            Files.move(file.toPath(), target, StandardCopyOption.REPLACE_EXISTING);
+                            Files.move(file, target, StandardCopyOption.REPLACE_EXISTING);
                         } catch (IOException ex) {
                             LOG.error(e.getMessage());
-                            LOG.info(String.format("Не удалось переместить файл %s в каталог failed.", file.getName()));
+                            LOG.info(String.format("Не удалось переместить файл %s в каталог failed.", file.getFileName()));
                         }
                     } catch (IOException e) {
                         LOG.error(e.getMessage());
-                        LOG.info(String.format("Произошла ошибка ввода-вывода при обработке ответа %s.", file.getName()));
+                        LOG.info(String.format("Произошла ошибка ввода-вывода при обработке ответа %s.", file.getFileName()));
                     } catch (ParsingException e) {
                         // Это исключение возникает в случае, если пытались парсить не до конца скопированный файл
-                        LOG.info(String.format("Не удалось распарсить ответ %s. Ответ будет обработан в следующем цикле.", file.getName()));
+                        LOG.info(String.format("Не удалось распарсить ответ %s. Ответ будет обработан в следующем цикле.", file.getFileName()));
                         // Больше ничего не делаем и оставляем файл ответа в каталоге IN до следующего цикла.
                     } catch (AttachmentException e) {
                         // Это исключение возникает, когда адаптер не успел обработать (сохранить) вложения, на которые
                         // ссылается обрабатываемый ответ.
-                        LOG.info(String.format("Нулевой размер файла с архивом, полученном при обработке ответа %s. Ответ будет обработан в следующем цикле.", file.getName()));
+                        LOG.info(String.format("Нулевой размер файла с архивом, полученном при обработке ответа %s. Ответ будет обработан в следующем цикле.", file.getFileName()));
                         // Больше ничего не делаем и оставляем файл ответа в каталоге IN до следующего цикла.
                     }
                 }
             }
-            LOG.info(String.format("Обработано %d ответов из %d.", filesNum, files.length-2));
+            LOG.info(String.format("Обработано %d ответов из %d.", filesNum, files.size()));
         }
     }
 
@@ -212,6 +218,22 @@ public class ResponseProcessor extends Thread {
         } catch (IOException e) {
             LOG.info(String.format("Файл %s недоступен для чтения.", file.getName()));
             return false;
+        }
+    }
+
+    /**
+     * Метод возвращает набор путей к файлам, находящимся в каталоге inputDir
+     * Из набора исключаются файлы, которые являются каталогами
+     * @return Set<Path> Набор файлов в каталоге с входящими запросами
+     */
+    private Set<Path> getFileList() {
+        try (Stream<Path> stream = Files.list(inputDir)) {
+            return stream
+                    .filter(file -> !Files.isDirectory(file))
+                    .collect(Collectors.toSet());
+        } catch (IOException e) {
+            LOG.error(e.getMessage());
+            throw new RuntimeException(e);
         }
     }
 
